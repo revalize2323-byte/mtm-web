@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTM — Modular Tool for Minecraft</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a1a;
+  color: #e0e0ff;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Join Screen */
+#join-screen {
+  text-align: center;
+  padding: 20px;
+}
+#join-screen h1 {
+  font-size: 42px;
+  color: #e040fb;
+  font-weight: 300;
+  letter-spacing: 3px;
+  margin-bottom: 5px;
+}
+#join-screen .sub {
+  color: #7c4dff;
+  font-size: 14px;
+  margin-bottom: 35px;
+}
+#join-screen input {
+  background: #1a1a2e;
+  border: 1px solid #4a0072;
+  padding: 14px 20px;
+  border-radius: 8px;
+  color: #e0e0ff;
+  font-size: 16px;
+  width: 260px;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+#join-screen input:focus {
+  border-color: #9c27b0;
+}
+#join-screen input::placeholder { color: #4a148c; }
+#join-screen .btn {
+  display: block;
+  margin: 15px auto 0;
+  padding: 14px 50px;
+  background: #9c27b0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#join-screen .btn:hover { background: #ab47bc; }
+#join-screen .btn:active { background: #7b1fa2; }
+.error-msg {
+  color: #ff5252;
+  font-size: 13px;
+  margin-top: 10px;
+  min-height: 20px;
+}
+
+/* Chat Screen */
+#chat-screen { display: none; height: 100vh; width: 100%; max-width: 700px; margin: 0 auto; flex-direction: column; }
+#chat-screen.active { display: flex; }
+
+/* Header */
+.chat-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 18px;
+  background: #0a0a1a;
+  border-bottom: 1px solid #1a1a2e;
+  flex-shrink: 0;
+}
+.chat-header .brand {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e040fb;
+  flex-shrink: 0;
+}
+.chat-header .player-name {
+  margin-left: 12px;
+  font-size: 13px;
+  color: #7c4dff;
+  flex-grow: 1;
+}
+.chat-header .status {
+  font-size: 11px;
+  color: #4a148c;
+}
+.chat-header .status.online { color: #4caf50; }
+
+/* Messages */
+.chat-msgs {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 15px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.chat-msgs::-webkit-scrollbar { width: 6px; }
+.chat-msgs::-webkit-scrollbar-track { background: #0a0a1a; }
+.chat-msgs::-webkit-scrollbar-thumb { background: #1a1a2e; border-radius: 3px; }
+
+.msg {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+.msg.user {
+  background: #6a1b9a;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+.msg.bot {
+  background: #1a1a2e;
+  color: #e0e0ff;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+.msg .sender {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  opacity: 0.7;
+}
+.msg.user .sender { color: #ce93d8; }
+.msg.bot .sender { color: #9c27b0; }
+.msg .time {
+  font-size: 10px;
+  opacity: 0.4;
+  margin-top: 4px;
+  text-align: right;
+}
+.msg.typing .dots::after {
+  content: '';
+  animation: dots 1.5s infinite;
+}
+@keyframes dots {
+  0% { content: ''; }
+  33% { content: '.'; }
+  66% { content: '..'; }
+  100% { content: '...'; }
+}
+.msg.welcome {
+  background: transparent;
+  border: 1px solid #1a1a2e;
+  color: #7c4dff;
+  align-self: center;
+  text-align: center;
+  font-size: 13px;
+  max-width: 100%;
+}
+
+/* Input */
+.chat-input {
+  display: flex;
+  padding: 12px 18px;
+  background: #0a0a1a;
+  border-top: 1px solid #1a1a2e;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.chat-input input {
+  flex-grow: 1;
+  background: #1a1a2e;
+  border: 1px solid #4a0072;
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: #e0e0ff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.chat-input input:focus { border-color: #9c27b0; }
+.chat-input input::placeholder { color: #4a148c; }
+.chat-input input:disabled { opacity: 0.5; }
+.chat-input .btn {
+  padding: 12px 20px;
+  background: #9c27b0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.chat-input .btn:hover { background: #ab47bc; }
+.chat-input .btn:active { background: #7b1fa2; }
+.chat-input .btn:disabled { opacity: 0.5; cursor: default; }
+
+@media (max-width: 500px) {
+  .msg { max-width: 92%; font-size: 13px; }
+  #join-screen input { width: 100%; }
+}
+
+/* Pin button */
+.pin-info {
+  font-size: 10px;
+  color: #4a148c;
+  text-align: center;
+  padding: 6px;
+  background: #0a0a1a;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- Join Screen -->
+<div id="join-screen">
+  <h1>⚡ MTM</h1>
+  <p class="sub">Modular Tool for Minecraft</p>
+  <input id="name-input" type="text" placeholder="Enter your IGN..." maxlength="16" autofocus>
+  <button class="btn" onclick="join()">Join Chat</button>
+  <div id="join-error" class="error-msg"></div>
+</div>
+
+<!-- Chat Screen -->
+<div id="chat-screen">
+  <div class="chat-header">
+    <span class="brand">⚡ MTM</span>
+    <span class="player-name" id="display-name"></span>
+    <span class="status" id="status">connecting...</span>
+  </div>
+
+  <div class="chat-msgs" id="msg-area">
+    <div class="msg welcome">Ask me anything about Minecraft, the server, or just chat.</div>
+  </div>
+
+  <div class="chat-input">
+    <input id="msg-input" type="text" placeholder="Type a message..." disabled>
+    <button class="btn" id="send-btn" onclick="send()" disabled>➤</button>
+  </div>
+  <div class="pin-info">⚡ Tip: Pin this tab for quick access</div>
+</div>
+
+<script>
+const API = window.location.origin + '/api/chat';
+let playerName = '';
+let msgHistory = [];
+let loading = false;
+
+// Load saved name
+const saved = sessionStorage.getItem('mtm_name');
+if (saved) {
+  document.getElementById('name-input').value = saved;
+  join();
+}
+
+function join() {
+  const name = document.getElementById('name-input').value.trim();
+  const err = document.getElementById('join-error');
+  if (!name || name.length > 16) {
+    err.textContent = 'Enter a valid IGN (1-16 characters)';
+    return;
+  }
+  err.textContent = '';
+  playerName = name;
+  sessionStorage.setItem('mtm_name', name);
+  document.getElementById('display-name').textContent = 'Chatting as ' + name;
+  document.getElementById('join-screen').style.display = 'none';
+  const chat = document.getElementById('chat-screen');
+  chat.classList.add('active');
+  document.getElementById('msg-input').disabled = false;
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('msg-input').focus();
+  setStatus('online', 'ready');
+}
+
+function setStatus(cls, text) {
+  const el = document.getElementById('status');
+  el.className = 'status' + (cls ? ' ' + cls : '');
+  el.textContent = text;
+}
+
+function addMsg(role, text, sender) {
+  const area = document.getElementById('msg-area');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+
+  if (sender) {
+    const s = document.createElement('div');
+    s.className = 'sender';
+    s.textContent = sender;
+    div.appendChild(s);
+  }
+
+  const t = document.createElement('div');
+  t.className = 'text';
+  t.textContent = text;
+  div.appendChild(t);
+
+  const time = document.createElement('div');
+  time.className = 'time';
+  const now = new Date();
+  time.textContent = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+  div.appendChild(time);
+
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+}
+
+function typingBubble(show) {
+  const area = document.getElementById('msg-area');
+  const existing = document.getElementById('typing-bubble');
+  if (existing) existing.remove();
+
+  if (show) {
+    const div = document.createElement('div');
+    div.id = 'typing-bubble';
+    div.className = 'msg bot';
+    div.innerHTML = '<div class="sender">MTM</div><div class="text dots">typing<span class="dots"></span></div>';
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+  }
+}
+
+async function send() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text || loading) return;
+
+  input.value = '';
+  addMsg('user', text, playerName);
+  msgHistory.push({ role: 'user', content: text });
+
+  loading = true;
+  input.disabled = true;
+  document.getElementById('send-btn').disabled = true;
+  setStatus('', 'typing...');
+  typingBubble(true);
+
+  try {
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ player_name: playerName, messages: msgHistory })
+    });
+    const data = await res.json();
+    typingBubble(false);
+
+    if (data.error) {
+      addMsg('bot', '⚠ Error: ' + data.error, 'MTM');
+    } else {
+      addMsg('bot', data.response, 'MTM');
+      msgHistory.push({ role: 'assistant', content: data.response });
+    }
+  } catch (e) {
+    typingBubble(false);
+    addMsg('bot', '⚠ Could not reach the server. Try again.', 'MTM');
+  }
+
+  loading = false;
+  input.disabled = false;
+  document.getElementById('send-btn').disabled = false;
+  input.focus();
+  setStatus('online', 'ready');
+}
+
+// Enter key sends
+document.getElementById('msg-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+});
+document.getElementById('name-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') { e.preventDefault(); join(); }
+});
+</script>
+</body>
+</html>
