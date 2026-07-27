@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTM — Modular Tool for Minecraft</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a1a;
+  color: #e0e0ff;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#join-screen { text-align: center; padding: 20px; }
+#join-screen h1 {
+  font-size: 42px; color: #e040fb; font-weight: 300;
+  letter-spacing: 3px; margin-bottom: 5px;
+}
+#join-screen .sub { color: #7c4dff; font-size: 14px; margin-bottom: 35px; }
+#join-screen input {
+  background: #1a1a2e; border: 1px solid #4a0072;
+  padding: 14px 20px; border-radius: 8px;
+  color: #e0e0ff; font-size: 16px; width: 260px;
+  outline: none; text-align: center;
+}
+#join-screen input:focus { border-color: #9c27b0; }
+#join-screen input::placeholder { color: #4a148c; }
+#join-screen .btn {
+  display: block; margin: 15px auto 0;
+  padding: 14px 50px; background: #9c27b0; color: white;
+  border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
+  cursor: pointer;
+}
+#join-screen .btn:hover { background: #ab47bc; }
+.error-msg { color: #ff5252; font-size: 13px; margin-top: 10px; min-height: 20px; }
+
+#chat-screen { display: none; height: 100vh; width: 100%; max-width: 700px; margin: 0 auto; flex-direction: column; }
+#chat-screen.active { display: flex; }
+
+.chat-header {
+  display: flex; align-items: center; padding: 14px 18px;
+  background: #0a0a1a; border-bottom: 1px solid #1a1a2e; flex-shrink: 0;
+}
+.chat-header .brand { font-size: 18px; font-weight: 600; color: #e040fb; }
+.chat-header .player-name { margin-left: 12px; font-size: 13px; color: #7c4dff; flex-grow: 1; }
+.chat-header .status { font-size: 11px; color: #4a148c; }
+.chat-header .status.online { color: #4caf50; }
+
+.chat-msgs {
+  flex-grow: 1; overflow-y: auto; padding: 15px 18px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.chat-msgs::-webkit-scrollbar { width: 6px; }
+.chat-msgs::-webkit-scrollbar-track { background: #0a0a1a; }
+.chat-msgs::-webkit-scrollbar-thumb { background: #1a1a2e; border-radius: 3px; }
+
+.msg { max-width: 85%; padding: 10px 14px; border-radius: 10px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
+.msg.user { background: #6a1b9a; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+.msg.bot { background: #1a1a2e; color: #e0e0ff; align-self: flex-start; border-bottom-left-radius: 4px; }
+.msg .sender { font-size: 11px; font-weight: 600; margin-bottom: 3px; opacity: 0.7; }
+.msg.user .sender { color: #ce93d8; }
+.msg.bot .sender { color: #9c27b0; }
+.msg .time { font-size: 10px; opacity: 0.4; margin-top: 4px; text-align: right; }
+.msg.welcome {
+  background: transparent; border: 1px solid #1a1a2e;
+  color: #7c4dff; align-self: center; text-align: center; font-size: 13px; max-width: 100%;
+}
+
+.chat-input {
+  display: flex; padding: 12px 18px; background: #0a0a1a;
+  border-top: 1px solid #1a1a2e; gap: 8px; flex-shrink: 0;
+}
+.chat-input input {
+  flex-grow: 1; background: #1a1a2e; border: 1px solid #4a0072;
+  padding: 12px 16px; border-radius: 8px; color: #e0e0ff;
+  font-size: 14px; outline: none;
+}
+.chat-input input:focus { border-color: #9c27b0; }
+.chat-input input::placeholder { color: #4a148c; }
+.chat-input input:disabled { opacity: 0.5; }
+.chat-input .btn {
+  padding: 12px 20px; background: #9c27b0; color: white;
+  border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
+  cursor: pointer; flex-shrink: 0;
+}
+.chat-input .btn:hover { background: #ab47bc; }
+.chat-input .btn:disabled { opacity: 0.5; cursor: default; }
+
+@media (max-width: 500px) {
+  .msg { max-width: 92%; font-size: 13px; }
+  #join-screen input { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div id="join-screen">
+  <h1>⚡ MTM</h1>
+  <p class="sub">Modular Tool for Minecraft — built by revalize</p>
+  <input id="name-input" type="text" placeholder="Enter your IGN..." maxlength="16" autofocus>
+  <button class="btn" onclick="join()">Join Chat</button>
+  <div id="join-error" class="error-msg"></div>
+</div>
+
+<div id="chat-screen">
+  <div class="chat-header">
+    <span class="brand">⚡ MTM</span>
+    <span class="player-name" id="display-name"></span>
+    <span class="status" id="status">ready</span>
+  </div>
+  <div class="chat-msgs" id="msg-area">
+    <div class="msg welcome">Type your IGN above to start chatting with MTM.</div>
+  </div>
+  <div class="chat-input">
+    <input id="msg-input" type="text" placeholder="Type a message..." disabled>
+    <button class="btn" id="send-btn" onclick="send()" disabled>➤</button>
+  </div>
+</div>
+
+<script>
+// === SETUP ===
+// Option A: Cloudflare Worker (recommended — no CORS issues)
+// 1. Go to https://dash.cloudflare.com > Workers & Pages > Create Worker
+// 2. Paste worker.js content, click Deploy, copy the worker URL
+// 3. Paste it below as API_URL
+const API_URL = 'https://your-worker.your-subdomain.workers.dev';
+
+// Option B: Direct Cerebras API (may be blocked by CORS in browser)
+// const API_URL = 'https://api.cerebras.ai/v1';
+
+const API_KEY = 'csk-v8rnfxfyyx9jky56crrfm26dmn4kfnj545f4y9d99j3ccyj3';
+const MODEL = 'zai-glm-4.7';
+const DIRECT = API_URL.includes('cerebras');
+
+const SYSTEM = "You are MTM — Modular Tool for Minecraft, built by revalize. You are a helpful AI assistant for a Minecraft server running on Minehut with Paper/Spigot, using the Origins plugin and PowerTrims. Be friendly, respectful, and concise. Address the player by their name: \"{name}\". You know Minecraft inside out. Only talk about Minecraft if the player asks about it first. Never give harmful advice.";
+
+let playerName = '';
+let msgHistory = [];
+let loading = false;
+let controller = null;
+
+const saved = sessionStorage.getItem('mtm_name');
+if (saved) { document.getElementById('name-input').value = saved; join(); }
+
+function join() {
+  const name = document.getElementById('name-input').value.trim();
+  const err = document.getElementById('join-error');
+  if (!name || name.length > 16) { err.textContent = 'Enter a valid IGN (1-16 characters)'; return; }
+  err.textContent = '';
+  playerName = name;
+  sessionStorage.setItem('mtm_name', name);
+  document.getElementById('display-name').textContent = 'Chatting as ' + name;
+  document.getElementById('join-screen').style.display = 'none';
+  document.getElementById('chat-screen').classList.add('active');
+  document.getElementById('msg-input').disabled = false;
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('msg-input').focus();
+  // Welcome
+  const area = document.getElementById('msg-area');
+  area.innerHTML = '<div class="msg welcome">Ask me anything about Minecraft or the server, ' + name + '.</div>';
+}
+
+function addMsg(role, text, sender) {
+  const area = document.getElementById('msg-area');
+  const el = document.getElementById('typing-el');
+  if (el) el.remove();
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+  if (sender) { const s = document.createElement('div'); s.className = 'sender'; s.textContent = sender; d.appendChild(s); }
+  const t = document.createElement('div'); t.className = 'text'; t.textContent = text; d.appendChild(t);
+  const tm = document.createElement('div'); tm.className = 'time';
+  const n = new Date();
+  tm.textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+  d.appendChild(tm);
+  area.appendChild(d);
+  area.scrollTop = area.scrollHeight;
+}
+
+function showTyping() {
+  const area = document.getElementById('msg-area');
+  const el = document.getElementById('typing-el');
+  if (el) el.remove();
+  const d = document.createElement('div'); d.id = 'typing-el';
+  d.className = 'msg bot';
+  d.innerHTML = '<div class="sender">MTM</div><div class="text">typing...</div>';
+  area.appendChild(d);
+  area.scrollTop = area.scrollHeight;
+}
+
+async function send() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text || loading) return;
+  input.value = '';
+  addMsg('user', text, playerName);
+  msgHistory.push({ role: 'user', content: text });
+  loading = true; input.disabled = true;
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('status').textContent = 'thinking...';
+  showTyping();
+  try {
+    const endpoint = DIRECT ? API_URL + '/chat/completions' : API_URL;
+    const headers = { 'Content-Type': 'application/json' };
+    if (DIRECT) headers['Authorization'] = 'Bearer ' + API_KEY;
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [{ role: 'system', content: SYSTEM.replace('{name}', playerName) }, ...msgHistory],
+        max_tokens: 2048,
+        temperature: 0.7,
+      })
+    });
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(errText || 'HTTP ' + res.status);
+    }
+    const data = await res.json();
+    const reply = data.choices[0].message.content;
+    addMsg('bot', reply, 'MTM');
+    msgHistory.push({ role: 'assistant', content: reply });
+  } catch (e) {
+    addMsg('bot', '⚠ Error: ' + e.message, 'MTM');
+  }
+  loading = false; input.disabled = false;
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('status').textContent = 'ready';
+  input.focus();
+}
+
+document.getElementById('msg-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+});
+document.getElementById('name-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') { e.preventDefault(); join(); }
+});
+</script>
+</body>
+</html>
