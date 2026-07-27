@@ -123,19 +123,8 @@ body {
 </div>
 
 <script>
-// === SETUP ===
-// Option A: Cloudflare Worker (recommended — no CORS issues)
-// 1. Go to https://dash.cloudflare.com > Workers & Pages > Create Worker
-// 2. Paste worker.js content, click Deploy, copy the worker URL
-// 3. Paste it below as API_URL
-const API_URL = 'https://mtm-web.revalize2323.workers.dev';
-
-// Option B: Direct Cerebras API (may be blocked by CORS in browser)
-// const API_URL = 'https://api.cerebras.ai/v1';
-
-const API_KEY = 'csk-v8rnfxfyyx9jky56crrfm26dmn4kfnj545f4y9d99j3ccyj3';
+const API_URL = '/api/chat';
 const MODEL = 'zai-glm-4.7';
-const DIRECT = API_URL.includes('cerebras');
 
 const SYSTEM = "You are MTM — Modular Tool for Minecraft, built by revalize. You are a helpful AI assistant for a Minecraft server running on Minehut with Paper/Spigot, using the Origins plugin and PowerTrims. Be friendly, respectful, and concise. Address the player by their name: \"{name}\". You know Minecraft inside out. Only talk about Minecraft if the player asks about it first. Never give harmful advice.";
 
@@ -204,12 +193,9 @@ async function send() {
   document.getElementById('status').textContent = 'thinking...';
   showTyping();
   try {
-    const endpoint = DIRECT ? API_URL + '/chat/completions' : API_URL;
-    const headers = { 'Content-Type': 'application/json' };
-    if (DIRECT) headers['Authorization'] = 'Bearer ' + API_KEY;
-    const res = await fetch(endpoint, {
+    const res = await fetch(API_URL, {
       method: 'POST',
-      headers: headers,
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: MODEL,
         messages: [{ role: 'system', content: SYSTEM.replace('{name}', playerName) }, ...msgHistory],
