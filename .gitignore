@@ -5,3 +5,9 @@ venv/
 .venv/
 mtm_config.json
 mtm_history.json
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
