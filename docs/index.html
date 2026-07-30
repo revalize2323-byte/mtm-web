@@ -6,6 +6,7 @@
 <title>MTM — Modular Tool for Minecraft</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
   background: #0a0a1a;
   color: #e0e0ff;
@@ -14,104 +15,322 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+  position: relative;
 }
 
-#join-screen { text-align: center; padding: 20px; }
+#stars {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---- Join Screen ---- */
+#join-screen {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 20px;
+  animation: fadeIn 1s ease;
+}
 #join-screen h1 {
-  font-size: 42px; color: #e040fb; font-weight: 300;
-  letter-spacing: 3px; margin-bottom: 5px;
+  font-size: 56px;
+  font-weight: 200;
+  letter-spacing: 6px;
+  margin-bottom: 5px;
+  background: linear-gradient(135deg, #e040fb, #7c4dff, #ff69b4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 40px rgba(224, 64, 251, 0.3);
 }
-#join-screen .sub { color: #7c4dff; font-size: 14px; margin-bottom: 35px; }
+#join-screen .sub {
+  color: rgba(124, 77, 255, 0.8);
+  font-size: 14px;
+  margin-bottom: 35px;
+  letter-spacing: 1px;
+}
+#join-screen .input-wrap {
+  position: relative;
+  display: inline-block;
+}
 #join-screen input {
-  background: #1a1a2e; border: 1px solid #4a0072;
-  padding: 14px 20px; border-radius: 8px;
-  color: #e0e0ff; font-size: 16px; width: 260px;
-  outline: none; text-align: center;
+  background: rgba(26, 26, 46, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(224, 64, 251, 0.3);
+  padding: 14px 20px;
+  border-radius: 12px;
+  color: #e0e0ff;
+  font-size: 16px;
+  width: 280px;
+  outline: none;
+  text-align: center;
+  transition: all 0.3s ease;
 }
-#join-screen input:focus { border-color: #9c27b0; }
-#join-screen input::placeholder { color: #4a148c; }
+#join-screen input:focus {
+  border-color: #e040fb;
+  box-shadow: 0 0 20px rgba(224, 64, 251, 0.2);
+}
+#join-screen input::placeholder { color: rgba(74, 20, 140, 0.6); }
 #join-screen .btn {
-  display: block; margin: 15px auto 0;
-  padding: 14px 50px; background: #9c27b0; color: white;
-  border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
+  display: block;
+  margin: 18px auto 0;
+  padding: 14px 50px;
+  background: linear-gradient(135deg, #9c27b0, #e040fb);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
-#join-screen .btn:hover { background: #ab47bc; }
-.error-msg { color: #ff5252; font-size: 13px; margin-top: 10px; min-height: 20px; }
+#join-screen .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(224, 64, 251, 0.4);
+}
+#join-screen .btn:active {
+  transform: translateY(0);
+}
+.error-msg { color: #ff5252; font-size: 13px; margin-top: 12px; min-height: 20px; opacity: 0.9; }
 
-#chat-screen { display: none; height: 100vh; width: 100%; max-width: 700px; margin: 0 auto; flex-direction: column; }
-#chat-screen.active { display: flex; }
+/* ---- Chat Screen ---- */
+#chat-screen {
+  display: none;
+  height: 100vh;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+#chat-screen.active { display: flex; animation: fadeIn 0.4s ease; }
 
 .chat-header {
-  display: flex; align-items: center; padding: 14px 18px;
-  background: #0a0a1a; border-bottom: 1px solid #1a1a2e; flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  background: rgba(10, 10, 26, 0.7);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(224, 64, 251, 0.15);
+  flex-shrink: 0;
 }
-.chat-header .brand { font-size: 18px; font-weight: 600; color: #e040fb; }
-.chat-header .player-name { margin-left: 12px; font-size: 13px; color: #7c4dff; flex-grow: 1; }
-.chat-header .status { font-size: 11px; color: #4a148c; }
-.chat-header .status.online { color: #4caf50; }
+.chat-header .brand {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #e040fb, #ff69b4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.chat-header .player-name {
+  margin-left: 12px;
+  font-size: 13px;
+  color: rgba(124, 77, 255, 0.7);
+  flex-grow: 1;
+}
+.chat-header .status-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(124, 77, 255, 0.6);
+}
+.chat-header .status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4caf50;
+  animation: pulse 2s infinite;
+}
 
+/* ---- Messages ---- */
 .chat-msgs {
-  flex-grow: 1; overflow-y: auto; padding: 15px 18px;
-  display: flex; flex-direction: column; gap: 8px;
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 15px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-.chat-msgs::-webkit-scrollbar { width: 6px; }
-.chat-msgs::-webkit-scrollbar-track { background: #0a0a1a; }
-.chat-msgs::-webkit-scrollbar-thumb { background: #1a1a2e; border-radius: 3px; }
+.chat-msgs::-webkit-scrollbar { width: 4px; }
+.chat-msgs::-webkit-scrollbar-track { background: transparent; }
+.chat-msgs::-webkit-scrollbar-thumb {
+  background: rgba(224, 64, 251, 0.3);
+  border-radius: 2px;
+}
+.chat-msgs::-webkit-scrollbar-thumb:hover {
+  background: rgba(224, 64, 251, 0.5);
+}
 
-.msg { max-width: 85%; padding: 10px 14px; border-radius: 10px; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
-.msg.user { background: #6a1b9a; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-.msg.bot { background: #1a1a2e; color: #e0e0ff; align-self: flex-start; border-bottom-left-radius: 4px; }
-.msg .sender { font-size: 11px; font-weight: 600; margin-bottom: 3px; opacity: 0.7; }
+.msg {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-wrap: break-word;
+  animation: slideIn 0.3s ease;
+}
+.msg.user {
+  background: linear-gradient(135deg, rgba(106, 27, 154, 0.7), rgba(156, 39, 176, 0.5));
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(224, 64, 251, 0.15);
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+.msg.bot {
+  background: rgba(26, 26, 46, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(124, 77, 255, 0.1);
+  color: #e0e0ff;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+.msg .sender {
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  opacity: 0.7;
+}
 .msg.user .sender { color: #ce93d8; }
-.msg.bot .sender { color: #9c27b0; }
-.msg .time { font-size: 10px; opacity: 0.4; margin-top: 4px; text-align: right; }
+.msg.bot .sender {
+  background: linear-gradient(135deg, #e040fb, #7c4dff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.msg .time {
+  font-size: 10px;
+  opacity: 0.35;
+  margin-top: 6px;
+  text-align: right;
+}
 .msg.welcome {
-  background: transparent; border: 1px solid #1a1a2e;
-  color: #7c4dff; align-self: center; text-align: center; font-size: 13px; max-width: 100%;
+  background: rgba(26, 26, 46, 0.3);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(124, 77, 255, 0.15);
+  color: rgba(124, 77, 255, 0.8);
+  align-self: center;
+  text-align: center;
+  font-size: 13px;
+  max-width: 100%;
+  animation: none;
 }
 
+/* ---- Typing Indicator ---- */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+}
+.typing-indicator span {
+  width: 6px;
+  height: 6px;
+  background: #e040fb;
+  border-radius: 50%;
+  animation: typingBounce 1.4s infinite;
+}
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ---- Input ---- */
 .chat-input {
-  display: flex; padding: 12px 18px; background: #0a0a1a;
-  border-top: 1px solid #1a1a2e; gap: 8px; flex-shrink: 0;
+  display: flex;
+  padding: 14px 18px;
+  background: rgba(10, 10, 26, 0.7);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(224, 64, 251, 0.15);
+  gap: 8px;
+  flex-shrink: 0;
 }
 .chat-input input {
-  flex-grow: 1; background: #1a1a2e; border: 1px solid #4a0072;
-  padding: 12px 16px; border-radius: 8px; color: #e0e0ff;
-  font-size: 14px; outline: none;
+  flex-grow: 1;
+  background: rgba(26, 26, 46, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(224, 64, 251, 0.2);
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: #e0e0ff;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
 }
-.chat-input input:focus { border-color: #9c27b0; }
-.chat-input input::placeholder { color: #4a148c; }
-.chat-input input:disabled { opacity: 0.5; }
+.chat-input input:focus {
+  border-color: #e040fb;
+  box-shadow: 0 0 20px rgba(224, 64, 251, 0.1);
+}
+.chat-input input::placeholder { color: rgba(74, 20, 140, 0.5); }
+.chat-input input:disabled { opacity: 0.4; }
 .chat-input .btn {
-  padding: 12px 20px; background: #9c27b0; color: white;
-  border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
-  cursor: pointer; flex-shrink: 0;
+  padding: 12px 22px;
+  background: linear-gradient(135deg, #9c27b0, #e040fb);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
 }
-.chat-input .btn:hover { background: #ab47bc; }
-.chat-input .btn:disabled { opacity: 0.5; cursor: default; }
+.chat-input .btn:hover:not(:disabled) {
+  box-shadow: 0 0 25px rgba(224, 64, 251, 0.35);
+}
+.chat-input .btn:disabled { opacity: 0.4; cursor: default; }
 
+/* ---- Animations ---- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ---- Responsive ---- */
 @media (max-width: 500px) {
   .msg { max-width: 92%; font-size: 13px; }
   #join-screen input { width: 100%; }
+  #join-screen h1 { font-size: 40px; }
 }
 </style>
 </head>
 <body>
 
+<canvas id="stars"></canvas>
+
 <div id="join-screen">
-  <h1>⚡ MTM</h1>
+  <h1>MTM</h1>
   <p class="sub">Modular Tool for Minecraft — built by revalize</p>
-  <input id="name-input" type="text" placeholder="Enter your IGN..." maxlength="16" autofocus>
+  <div class="input-wrap">
+    <input id="name-input" type="text" placeholder="Enter your IGN..." maxlength="16" autofocus>
+  </div>
   <button class="btn" onclick="join()">Join Chat</button>
   <div id="join-error" class="error-msg"></div>
 </div>
 
 <div id="chat-screen">
   <div class="chat-header">
-    <span class="brand">⚡ MTM</span>
+    <span class="brand">MTM</span>
     <span class="player-name" id="display-name"></span>
-    <span class="status" id="status">ready</span>
+    <div class="status-wrap">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status">ready</span>
+    </div>
   </div>
   <div class="chat-msgs" id="msg-area">
     <div class="msg welcome">Type your IGN above to start chatting with MTM.</div>
@@ -123,6 +342,74 @@ body {
 </div>
 
 <script>
+// ===== Star Particle System =====
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let stars = [];
+let w, h;
+
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+const COUNT = 160;
+const pinkColors = [
+  '255, 105, 180',   // hot pink
+  '255, 20, 147',    // deep pink
+  '255, 182, 193',   // light pink
+  '224, 64, 251',    // purple-pink
+  '255, 255, 255',   // white
+  '199, 21, 133',    // medium violet red
+];
+
+for (let i = 0; i < COUNT; i++) {
+  stars.push({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    size: Math.random() * 2.5 + 0.5,
+    alpha: Math.random() * 0.8 + 0.2,
+    speed: Math.random() * 0.15 + 0.03,
+    driftX: (Math.random() - 0.5) * 0.3,
+    driftY: (Math.random() - 0.5) * 0.3 - 0.1,
+    twinkleSpeed: Math.random() * 2 + 0.5,
+    twinklePhase: Math.random() * Math.PI * 2,
+    color: pinkColors[Math.floor(Math.random() * pinkColors.length)],
+  });
+}
+
+function drawStars(time) {
+  ctx.clearRect(0, 0, w, h);
+  for (const s of stars) {
+    const twinkle = Math.sin(time * s.twinkleSpeed + s.twinklePhase) * 0.3 + 0.7;
+    const alpha = s.alpha * twinkle;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${s.color}, ${alpha})`;
+    ctx.fill();
+    // glow
+    if (s.size > 1.5) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${s.color}, ${alpha * 0.12})`;
+      ctx.fill();
+    }
+    // drift
+    s.x += s.driftX;
+    s.y += s.driftY;
+    // wrap
+    if (s.x < -10) s.x = w + 10;
+    if (s.x > w + 10) s.x = -10;
+    if (s.y < -10) s.y = h + 10;
+    if (s.y > h + 10) s.y = -10;
+  }
+  requestAnimationFrame(drawStars);
+}
+drawStars(0);
+
+// ===== Chat Logic =====
 const API_URL = '/api/chat';
 const MODEL = 'zai-glm-4.7';
 
@@ -214,33 +501,33 @@ Arachnid: Bane of Arthropods vulnerability. Less HP. Higher jump, safe landing. 
 Oozeling: Extremely bouncy. Knocked around easier. Higher jumps (even more sneaking). Armor less effective. Focus: Amplify bounciness.
 
 === POWER TRIMS 2.9 ===
-Wearing a full matching trimmed armor set grants powers. Activate ability with Shift+F. Disrupt abilities trigger at low HP (4 hearts).
-Sentry: Passive — Resistance I.
-Dune: Passive — Haste + Fire Resistance. Active — Sandstorm: blinds/slows enemies, knockback, Strength+Speed 10s. 60s CD.
-Eye: Passive — Night Vision. Active — True Sight: reveal entities within 80 blocks, remove invisibility, glow, slow/weak. 120s CD.
-Coast: Passive — Dolphin's Grace. Active — Water Burst: pull all within 30 blocks, Weakness II+Slowness II 4s. 60s CD.
-Wild: Passive — Regen I. Active — Vine Grapple: 60 blocks, grapple, poison 10s. 20s CD. Disrupt — Root Trap at 4 hearts.
-Tide: Passive — Dolphin's Grace III. Active — Water Wall: 6-block wave, 20 blocks, push/slow. 120s CD.
-Snout: Passive — Strength I. Active — Summon Wither Skeletons 90s. 120s CD.
-Rib: Passive — Resistance I. Active — Summon Bogged 60s. 60s CD.
-Spire: Passive — Speed II. Active — Dash: 8 blocks forward, enemies take +60% damage. 30s CD.
-Vex: Passive — Speed II. Active — Debuff radius 30, 8 damage. 120s CD. Disrupt — True Invisibility 10s.
-Ward: Passive — Resistance I. Active — Barrier: Absorption V + Resistance III + Fire Resist 10s. 120s CD.
-Wayfinder: Passive — Fast sneak. Active — Mark location, teleport, infinite range. 120s CD.
-Silence: Passive — Strength II. Active — Warden's Roar: disable pearls 15 blocks, blind/slow 20s. 90s CD. Disrupt — Warden's Echo at 4 hearts.
-Raiser: Passive — No fall damage. Active — Shockwave: pull enemies, slowness+weakness, disable pearls 10s. 120s CD.
-Host: Passive — Mobs ignore you. Active — Steal 2 hearts + effects from enemies within 10 blocks. 120s CD.
-Flow: Passive — Speed II. Active — Fly 20s, 1 heart/sec. 60s CD.
-Bolt: Passive — Speed III. Active — Lightning chain: 3 targets, 10 blocks, 6 then 4 damage. 20s CD.
+Full matching trimmed armor grants powers. Activate with Shift+F. Disrupt triggers at 8 HP (4 hearts). Passives from full set.
+Sentry: Passive — Resistance I. Active — shoot 3 spectral arrows (spread 0.15), 0.5 true damage. 90s CD.
+Dune: Passive — Haste I + Fire Res I. Active — Sandstorm: 15-block tornado, pull+lift, 2 dmg/sec, 10s. 60s CD.
+Eye: Passive — Night Vision I. Active — True Sight: reveal all entities 80 blocks (vertical 50), 30s. 120s CD.
+Coast: Passive — Dolphin's Grace I. Active — Water Burst: 10 dmg, pull, Weakness I + Slowness I 4s, 30-block radius. 60s CD.
+Wild: Passive — Regen I. Active — Vine Grapple: 60 blocks, poison 10s. 20s CD. Disrupt — Root Trap 5x3 at 8 HP, 150 ticks. 20s CD.
+Tide: Passive — Dolphin's Grace II. Active — Wave: 10 wide, 10 tall, knockback, 20 moves, 300 ticks. 120s CD.
+Snout: Passive — Strength I. Active — summon 5 Wither Skeletons (40 HP, 12 dmg, speed 0.25) 90s. 120s CD.
+Rib: Passive — Resistance I. Active — summon 3 Bogged (40 HP, 10 dmg, speed 0.25) 60s. 60s CD.
+Spire: Passive — Speed I. Active — Dash: 8 blocks, 2.0 speed, knockback 1.5, slow 3s, vuln +60% dmg 5s. 30s CD.
+Vex: Passive — Speed I. Active — 8 dmg radius 30, blind+debuff 20s. 120s CD. Disrupt — True Invisibility 10s at 8 HP. 120s CD.
+Ward: Passive — Resistance I. Active — Barrier: Absorption IV + Resistance II, 10s. 120s CD.
+Wayfinder: Passive — Fast sneak. Active — Mark location, teleport infinite range. 120s CD.
+Silence: Passive — Strength I. Active — Warden's Roar radius 15: blind/slow/hunger/glow 20s, disable pearls 10s. 90s CD. Disrupt — Warden's Echo: enemies Weak+Slow, self Resist+Regen, 6-block radius. 120s CD.
+Raiser: Passive — No fall damage. Active — Shockwave: pull all 15 blocks, boost up, disable pearls 10s. 120s CD.
+Host: Passive — Most mobs ignore you. Active — steal 4 HP (2 hearts) + effects, radius 10. 120s CD.
+Flow: Passive — Speed I. Active — Fly 20s, 1 heart/sec, no mace bonus. 60s CD.
+Bolt: Passive — Speed II. Active — Chain lightning: 3 targets, initial 6 dmg, chain 4 dmg, Weakness I 5s, range 20. 20s CD.
 Shaper: No abilities.
-Mythic Rituals: /upgrade opens Ritual menu. Upgrade armor with items. Silence Ultimate transforms into Warden (needs LibsDisguises). Fill Rage Bar (fighting), Shift+1 to transform. Sub-abilities: Shift+7,8,9.
+Mythic Rituals: /upgrade opens Ritual menu. Upgrade armor with catalyst items. Build Rage/Charge by fighting (max 100-150). Shift+1 to transform. Ultimates available for: Silence (Warden — 150 rage, 40s, sub-abilities: Boom/Grasp/Leap via Shift+7/8/9), Wild (Overgrowth — 150 charge, 15s, scale 1.3, 30 HP, sub-abilities: Slam/Ensnare/Toxin), Coast (Tidal Lord — 100 charge, 20s, scale 1.2, 40 HP, sub-abilities: Trident/Beam/Dash), Tide (Guardian — 100 charge, 20s, scale 1.15, 30 HP, sub-abilities: Guardian/Water Wall/Vortex/Depth Charge/Blessing).
+Tool Trims (experimental): Apply trims to tools for weapon-specific abilities (melee, ranged, trident, shield, tool). Enabled templates: bolt, silence, wild, vex, dune, ward, coast, wayfinder. Disabled by default.
 Commands: /ptconfig (admin), /upgrade (rituals), /trust <player>, /untrust <player>, /trustlist, /pt resetcooldown.
 `;
 
 let playerName = '';
 let msgHistory = [];
 let loading = false;
-let controller = null;
 
 const saved = sessionStorage.getItem('mtm_name');
 if (saved) { document.getElementById('name-input').value = saved; join(); }
@@ -258,7 +545,6 @@ function join() {
   document.getElementById('msg-input').disabled = false;
   document.getElementById('send-btn').disabled = false;
   document.getElementById('msg-input').focus();
-  // Welcome
   const area = document.getElementById('msg-area');
   area.innerHTML = '<div class="msg welcome">Ask me anything about Minecraft or the server, ' + name + '.</div>';
 }
@@ -269,9 +555,18 @@ function addMsg(role, text, sender) {
   if (el) el.remove();
   const d = document.createElement('div');
   d.className = 'msg ' + role;
-  if (sender) { const s = document.createElement('div'); s.className = 'sender'; s.textContent = sender; d.appendChild(s); }
-  const t = document.createElement('div'); t.className = 'text'; t.textContent = text; d.appendChild(t);
-  const tm = document.createElement('div'); tm.className = 'time';
+  if (sender) {
+    const s = document.createElement('div');
+    s.className = 'sender';
+    s.textContent = sender;
+    d.appendChild(s);
+  }
+  const t = document.createElement('div');
+  t.className = 'text';
+  t.textContent = text;
+  d.appendChild(t);
+  const tm = document.createElement('div');
+  tm.className = 'time';
   const n = new Date();
   tm.textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
   d.appendChild(tm);
@@ -283,9 +578,10 @@ function showTyping() {
   const area = document.getElementById('msg-area');
   const el = document.getElementById('typing-el');
   if (el) el.remove();
-  const d = document.createElement('div'); d.id = 'typing-el';
+  const d = document.createElement('div');
+  d.id = 'typing-el';
   d.className = 'msg bot';
-  d.innerHTML = '<div class="sender">MTM</div><div class="text">typing...</div>';
+  d.innerHTML = '<div class="sender">MTM</div><div class="text"><span class="typing-indicator"><span></span><span></span><span></span></span></div>';
   area.appendChild(d);
   area.scrollTop = area.scrollHeight;
 }
@@ -297,7 +593,8 @@ async function send() {
   input.value = '';
   addMsg('user', text, playerName);
   msgHistory.push({ role: 'user', content: text });
-  loading = true; input.disabled = true;
+  loading = true;
+  input.disabled = true;
   document.getElementById('send-btn').disabled = true;
   document.getElementById('status').textContent = 'thinking...';
   showTyping();
@@ -323,7 +620,8 @@ async function send() {
   } catch (e) {
     addMsg('bot', '⚠ Error: ' + e.message, 'MTM');
   }
-  loading = false; input.disabled = false;
+  loading = false;
+  input.disabled = false;
   document.getElementById('send-btn').disabled = false;
   document.getElementById('status').textContent = 'ready';
   input.focus();
