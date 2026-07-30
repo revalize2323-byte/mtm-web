@@ -5,3 +5,5 @@ venv/
 .venv/
 mtm_config.json
 mtm_history.json
+node_modules/
+.netlify/

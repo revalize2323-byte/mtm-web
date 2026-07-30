@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTM Admin</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a1a;
+  color: #e0e0ff;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+#stars {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%; z-index: 0;
+  pointer-events: none;
+}
+
+/* Login */
+#login-screen {
+  position: relative; z-index: 1;
+  text-align: center; animation: fadeIn 0.6s ease;
+}
+#login-screen h1 {
+  font-size: 48px; font-weight: 200; letter-spacing: 4px; margin-bottom: 4px;
+  background: linear-gradient(135deg, #e040fb, #7c4dff, #ff69b4);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+#login-screen .sub { color: rgba(124,77,255,0.6); font-size: 13px; margin-bottom: 30px; }
+#login-screen input {
+  background: rgba(26,26,46,0.6); backdrop-filter: blur(12px);
+  border: 1px solid rgba(224,64,251,0.3);
+  padding: 14px 20px; border-radius: 12px; color: #e0e0ff;
+  font-size: 16px; width: 260px; outline: none; text-align: center;
+  transition: all 0.3s ease;
+}
+#login-screen input:focus { border-color: #e040fb; box-shadow: 0 0 20px rgba(224,64,251,0.2); }
+#login-screen input::placeholder { color: rgba(74,20,140,0.5); }
+#login-screen .btn {
+  display: block; margin: 15px auto 0;
+  padding: 12px 45px;
+  background: linear-gradient(135deg, #9c27b0, #e040fb);
+  color: white; border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: all 0.3s ease;
+}
+#login-screen .btn:hover { box-shadow: 0 0 25px rgba(224,64,251,0.4); }
+.error-msg { color: #ff5252; font-size: 13px; margin-top: 12px; min-height: 20px; }
+
+/* Admin Panel */
+#admin-panel { display: none; height: 100vh; width: 100%; max-width: 900px; margin: 0 auto; flex-direction: column; position: relative; z-index: 1; }
+#admin-panel.active { display: flex; animation: fadeIn 0.3s ease; }
+
+.admin-header {
+  display: flex; align-items: center; padding: 12px 20px;
+  background: rgba(10,10,26,0.7); backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(224,64,251,0.15); flex-shrink: 0;
+}
+.admin-header .brand {
+  font-size: 16px; font-weight: 700;
+  background: linear-gradient(135deg, #e040fb, #ff69b4);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.admin-header .badge {
+  font-size: 10px; background: rgba(224,64,251,0.2);
+  color: #e040fb; padding: 2px 8px; border-radius: 10px;
+  margin-left: 8px;
+}
+.admin-header .spacer { flex-grow: 1; }
+.admin-header .stats { font-size: 12px; color: rgba(124,77,255,0.6); margin-right: 15px; }
+.admin-header .logout {
+  background: none; border: 1px solid rgba(224,64,251,0.3);
+  color: rgba(224,64,251,0.7); padding: 6px 14px; border-radius: 8px;
+  cursor: pointer; font-size: 12px; transition: all 0.3s;
+}
+.admin-header .logout:hover { border-color: #e040fb; color: #e040fb; }
+
+/* Tabs */
+.tab-bar {
+  display: flex; background: rgba(10,10,26,0.5);
+  border-bottom: 1px solid rgba(224,64,251,0.1); flex-shrink: 0;
+}
+.tab-btn {
+  padding: 10px 24px; background: none; border: none;
+  color: rgba(124,77,255,0.5); font-size: 13px; font-weight: 600;
+  cursor: pointer; border-bottom: 2px solid transparent;
+  transition: all 0.3s;
+}
+.tab-btn:hover { color: rgba(124,77,255,0.8); }
+.tab-btn.active { color: #e040fb; border-bottom-color: #e040fb; }
+
+.tab-content { display: none; flex-grow: 1; flex-direction: column; }
+.tab-content.active { display: flex; }
+
+/* Chat Tab */
+#tab-chat .chat-msgs {
+  flex-grow: 1; overflow-y: auto; padding: 15px 18px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+#tab-chat .chat-msgs::-webkit-scrollbar { width: 4px; }
+#tab-chat .chat-msgs::-webkit-scrollbar-track { background: transparent; }
+#tab-chat .chat-msgs::-webkit-scrollbar-thumb { background: rgba(224,64,251,0.3); border-radius: 2px; }
+
+#tab-chat .msg {
+  max-width: 85%; padding: 10px 14px; border-radius: 14px;
+  font-size: 14px; line-height: 1.5; word-wrap: break-word;
+  animation: slideIn 0.3s ease;
+}
+#tab-chat .msg.user {
+  background: linear-gradient(135deg, rgba(106,27,154,0.7), rgba(156,39,176,0.5));
+  backdrop-filter: blur(8px); border: 1px solid rgba(224,64,251,0.15);
+  color: white; align-self: flex-end; border-bottom-right-radius: 4px;
+}
+#tab-chat .msg.bot {
+  background: rgba(26,26,46,0.5); backdrop-filter: blur(8px);
+  border: 1px solid rgba(124,77,255,0.1);
+  color: #e0e0ff; align-self: flex-start; border-bottom-left-radius: 4px;
+}
+#tab-chat .msg .sender { font-size: 11px; font-weight: 600; margin-bottom: 4px; opacity: 0.7; }
+#tab-chat .msg.user .sender { color: #ce93d8; }
+#tab-chat .msg.bot .sender { background: linear-gradient(135deg,#e040fb,#7c4dff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+#tab-chat .msg .time { font-size: 10px; opacity: 0.35; margin-top: 4px; text-align: right; }
+#tab-chat .typing-dots { display: flex; align-items: center; gap: 4px; padding: 4px 0; }
+#tab-chat .typing-dots span {
+  width: 6px; height: 6px; background: #e040fb; border-radius: 50%;
+  animation: bounce 1.4s infinite;
+}
+#tab-chat .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+#tab-chat .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+.chat-input {
+  display: flex; padding: 12px 18px;
+  background: rgba(10,10,26,0.7); backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(224,64,251,0.15); gap: 8px; flex-shrink: 0;
+}
+.chat-input input {
+  flex-grow: 1; background: rgba(26,26,46,0.5); backdrop-filter: blur(8px);
+  border: 1px solid rgba(224,64,251,0.2);
+  padding: 12px 16px; border-radius: 12px; color: #e0e0ff;
+  font-size: 14px; outline: none; transition: all 0.3s;
+}
+.chat-input input:focus { border-color: #e040fb; box-shadow: 0 0 20px rgba(224,64,251,0.1); }
+.chat-input input::placeholder { color: rgba(74,20,140,0.5); }
+.chat-input input:disabled { opacity: 0.4; }
+.chat-input .btn {
+  padding: 12px 22px;
+  background: linear-gradient(135deg, #9c27b0, #e040fb);
+  color: white; border: none; border-radius: 12px;
+  font-size: 16px; font-weight: 600; cursor: pointer; flex-shrink: 0;
+  transition: all 0.3s;
+}
+.chat-input .btn:hover:not(:disabled) { box-shadow: 0 0 25px rgba(224,64,251,0.35); }
+.chat-input .btn:disabled { opacity: 0.4; cursor: default; }
+
+/* Logs Tab */
+#tab-logs { overflow: hidden; }
+#tab-logs .log-controls {
+  display: flex; gap: 10px; padding: 12px 18px;
+  border-bottom: 1px solid rgba(224,64,251,0.08); flex-shrink: 0;
+  flex-wrap: wrap;
+}
+#tab-logs .log-controls input, #tab-logs .log-controls select {
+  background: rgba(26,26,46,0.5); backdrop-filter: blur(8px);
+  border: 1px solid rgba(224,64,251,0.15);
+  padding: 8px 12px; border-radius: 8px; color: #e0e0ff;
+  font-size: 13px; outline: none; min-width: 120px;
+}
+#tab-logs .log-controls input:focus, #tab-logs .log-controls select:focus { border-color: #e040fb; }
+#tab-logs .log-controls input::placeholder { color: rgba(74,20,140,0.4); }
+#tab-logs .log-controls .count { font-size: 12px; color: rgba(124,77,255,0.5); align-self: center; margin-left: auto; }
+#tab-logs .log-refresh {
+  padding: 8px 16px; background: linear-gradient(135deg, #9c27b0, #e040fb);
+  color: white; border: none; border-radius: 8px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+}
+#tab-logs .log-scroll {
+  flex-grow: 1; overflow-y: auto; padding: 0;
+}
+#tab-logs .log-scroll::-webkit-scrollbar { width: 4px; }
+#tab-logs .log-scroll::-webkit-scrollbar-track { background: transparent; }
+#tab-logs .log-scroll::-webkit-scrollbar-thumb { background: rgba(224,64,251,0.3); border-radius: 2px; }
+
+#tab-logs table { width: 100%; border-collapse: collapse; font-size: 13px; }
+#tab-logs thead { position: sticky; top: 0; background: rgba(10,10,26,0.95); backdrop-filter: blur(8px); z-index: 1; }
+#tab-logs th {
+  padding: 10px 12px; text-align: left; font-weight: 600;
+  color: rgba(124,77,255,0.8); border-bottom: 1px solid rgba(224,64,251,0.1);
+  white-space: nowrap; cursor: pointer; user-select: none;
+}
+#tab-logs th:hover { color: #e040fb; }
+#tab-logs td {
+  padding: 8px 12px; border-bottom: 1px solid rgba(224,64,251,0.04);
+  vertical-align: top;
+}
+#tab-logs tr:hover td { background: rgba(224,64,251,0.03); }
+#tab-logs .col-time { white-space: nowrap; color: rgba(124,77,255,0.5); font-size: 11px; width: 80px; }
+#tab-logs .col-player { white-space: nowrap; color: #ce93d8; font-weight: 600; width: 100px; }
+#tab-logs .col-msg { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#tab-logs .col-reply { max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(224,224,255,0.7); }
+#tab-logs .no-logs { text-align: center; padding: 40px; color: rgba(124,77,255,0.4); font-size: 14px; }
+
+#tab-logs .log-expand {
+  cursor: pointer; color: #e040fb; opacity: 0.6; margin-left: 4px;
+}
+#tab-logs .log-expand:hover { opacity: 1; }
+/* expanded detail row */
+#tab-logs .detail-row td { padding: 12px 16px; background: rgba(26,26,46,0.3); }
+#tab-logs .detail-row .label { color: rgba(124,77,255,0.5); font-size: 11px; margin-bottom: 4px; }
+#tab-logs .detail-row .full-text { color: #e0e0ff; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bounce { 0%,60%,100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<!-- Login -->
+<div id="login-screen">
+  <h1>MTM Admin</h1>
+  <p class="sub">Modular Tool for Minecraft</p>
+  <input id="pw-input" type="password" placeholder="Admin password" autofocus>
+  <button class="btn" onclick="login()">Access Panel</button>
+  <div id="login-error" class="error-msg"></div>
+</div>
+
+<!-- Admin Panel -->
+<div id="admin-panel">
+  <div class="admin-header">
+    <span class="brand">MTM</span>
+    <span class="badge">Admin</span>
+    <span class="spacer"></span>
+    <span class="stats" id="log-count"></span>
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="chat" onclick="switchTab('chat')">Chat</button>
+    <button class="tab-btn" data-tab="logs" onclick="switchTab('logs'); loadLogs()">Activity Log</button>
+  </div>
+
+  <!-- Chat Tab -->
+  <div id="tab-chat" class="tab-content active">
+    <div class="chat-msgs" id="msg-area">
+      <div class="msg welcome" style="background:rgba(26,26,46,0.3);backdrop-filter:blur(4px);border:1px solid rgba(124,77,255,0.15);color:rgba(124,77,255,0.8);align-self:center;text-align:center;font-size:13px;max-width:100%;animation:none;">Admin chat — talk to MTM.</div>
+    </div>
+    <div class="chat-input">
+      <input id="msg-input" type="text" placeholder="Type a message..." disabled>
+      <button class="btn" id="send-btn" onclick="send()" disabled>➤</button>
+    </div>
+  </div>
+
+  <!-- Logs Tab -->
+  <div id="tab-logs" class="tab-content">
+    <div class="log-controls">
+      <input id="filter-player" type="text" placeholder="Filter by IGN..." oninput="filterLogs()">
+      <select id="filter-limit" onchange="filterLogs()">
+        <option value="50">Last 50</option>
+        <option value="100" selected>Last 100</option>
+        <option value="200">Last 200</option>
+        <option value="0">All</option>
+      </select>
+      <span class="count" id="filter-count"></span>
+      <button class="log-refresh" onclick="loadLogs()">Refresh</button>
+    </div>
+    <div class="log-scroll" id="log-scroll">
+      <table>
+        <thead>
+          <tr><th class="col-time">Time</th><th class="col-player">Player</th><th class="col-msg">Message</th><th class="col-reply">Response</th></tr>
+        </thead>
+        <tbody id="log-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = '/api/chat';
+const MODEL = 'zai-glm-4.7';
+const ADMIN_PW = 'mtm2024';
+
+// ===== Stars =====
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let stars = [], w, h;
+function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+window.addEventListener('resize', resize); resize();
+const pinkColors = ['255,105,180','255,20,147','255,182,193','224,64,251','255,255,255','199,21,133'];
+for (let i = 0; i < 120; i++) stars.push({
+  x: Math.random()*w, y: Math.random()*h, size: Math.random()*2.5+0.5,
+  alpha: Math.random()*0.8+0.2, speed: Math.random()*0.15+0.03,
+  driftX: (Math.random()-0.5)*0.3, driftY: (Math.random()-0.5)*0.3-0.1,
+  twinkleSpeed: Math.random()*2+0.5, twinklePhase: Math.random()*Math.PI*2,
+  color: pinkColors[Math.floor(Math.random()*pinkColors.length)],
+});
+function drawStars(time) {
+  ctx.clearRect(0,0,w,h);
+  for (const s of stars) {
+    const tw = Math.sin(time*s.twinkleSpeed+s.twinklePhase)*0.3+0.7;
+    const a = s.alpha*tw;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
+    ctx.fillStyle = `rgba(${s.color},${a})`; ctx.fill();
+    if (s.size>1.5) { ctx.beginPath(); ctx.arc(s.x,s.y,s.size*3,0,Math.PI*2); ctx.fillStyle = `rgba(${s.color},${a*0.12})`; ctx.fill(); }
+    s.x+=s.driftX; s.y+=s.driftY;
+    if (s.x<-10) s.x=w+10; if (s.x>w+10) s.x=-10;
+    if (s.y<-10) s.y=h+10; if (s.y>h+10) s.y=-10;
+  }
+  requestAnimationFrame(drawStars);
+}
+drawStars(0);
+
+// ===== Login =====
+let loggedIn = false;
+function login() {
+  const pw = document.getElementById('pw-input').value;
+  if (pw !== ADMIN_PW) {
+    document.getElementById('login-error').textContent = 'Invalid password';
+    return;
+  }
+  document.getElementById('login-error').textContent = '';
+  loggedIn = true;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-panel').classList.add('active');
+  document.getElementById('msg-input').disabled = false;
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('msg-input').focus();
+}
+
+function logout() {
+  loggedIn = false;
+  document.getElementById('admin-panel').classList.remove('active');
+  document.getElementById('login-screen').style.display = '';
+  document.getElementById('pw-input').value = '';
+  document.getElementById('msg-area').innerHTML = '<div class="msg welcome" style="background:rgba(26,26,46,0.3);backdrop-filter:blur(4px);border:1px solid rgba(124,77,255,0.15);color:rgba(124,77,255,0.8);align-self:center;text-align:center;font-size:13px;max-width:100%;animation:none;">Admin chat — talk to MTM.</div>';
+  document.getElementById('msg-input').disabled = true;
+  document.getElementById('send-btn').disabled = true;
+}
+
+document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+
+// ===== Tabs =====
+let currentTab = 'chat';
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ===== Chat =====
+let msgHistory = [];
+let loading = false;
+const SYSTEM = `You are MTM — Modular Tool for Minecraft, built by revalize. You are a helpful AI assistant for a Minecraft server running on Minehut with Paper/Spigot. The server uses Origins-Reborn with addon packs: Origins-Fantasy, Origins-Magic, Origins-Mobs, Origins-Monsters, and the Corrupted-Aspects mod. It also uses PowerTrims v2.9. Be friendly, respectful, and concise. Address the player by their name: "Admin". You know Minecraft inside out. Only talk about Minecraft or the plugins if the player asks first. Never give harmful advice.
+
+Use these commands when the player asks:
+- /build — suggest a random cool build idea
+- /recipe <item> — explain how to craft something
+- /seed — suggest a random interesting seed
+- /roll — pick a random origin for the player
+- /tip — share a random pro Minecraft tip
+- /challenge — give a random survival challenge
+- /invasion — describe a custom raid/pillager event
+- /lore — generate lore for a location or item
+- /potion — suggest a useful potion recipe
+- /structure — describe an interesting structure to find or build
+
+=== ORIGINS-REBORN ===
+Arachnid: Climb walls and ceilings. Shoot webs to trap foes. Carnivore diet. Fragile (less health). Arthropod.
+Avian: Slow falling. Fresh air (better natural regen). Tailwind (faster running). Can lay eggs. Vegetarian. No chestplate slot.
+Blazeborn: Fire immunity. Nether spawn. Burning wrath (fire aspect on attacks when on fire). Hotblooded (lose food in water). Water vulnerability. Damage from snowballs and potions. Flame particles.
+Elytrian: Has elytra. Launch into air. Aerial combatant (more damage while flying). Light armor only. Claustrophobia (weaker in low ceilings). More kinetic damage.
+Enderian: Throw ender pearls. Water vulnerability. Extra reach. Pumpkin hate (can't wear pumpkins). Ender particles. Damage from potions.
+Feline: Fall immunity. Sprint jump (extra height). Velvet paws (no fall damage, sneak to avoid triggering sculk). Nine lives. Weak arms (can't mine harder blocks). Scare creepers. Cat vision.
+Merling: Water breathing. Water vision. Aqua affinity. Swim speed. Like water (no fall damage in water). Aquatic. Conduit power on land. Air from potions.
+Phantom: Phantomize (switch to phantom form). Phasing (pass through blocks). Invisibility. Burn in daylight. Hunger over time. Fragile. Translucent.
+Shulk: Shulker inventory (extra rows). Natural armor. Strong arms. No shield. More exhaustion.
+Human: No powers. Ordinary Minecraft experience.
+
+=== ORIGINS-FANTASY ===
+Bard: Deal more damage on low health (Elegy). Regen from note blocks. Duplicate allays without jukebox. Regen right-clicking amethyst shard. Creepers drop music discs.
+Centaur: Always mounted on a horse. Super jump. Increased speed. Stronger on full moons. Perfect bow aim.
+Dragonborn: Store dragon breath in bottles. Stronger with more HP in the End. Healed by end crystals. Shoot dragon fireball with sword. Strong skin (less arrow damage).
+Dwarf: Infinite haste. Infinite night vision. Fortune increaser (more ore drops). Magic resistance (poison/harming immune). Small body (1 block tall).
+Elf: Perfect bow aim. Increased arrow damage and speed. Arrow effect booster. Bow burst ability.
+Gargoyle: Stone skin. Solid stance (knockback immune). Stiff (slower movement). Fire resistant. Potion resistant. Heavy blow (more melee damage). Natural armor.
+Giant: Double health. Heavy blow (more melee damage). Poor shot (bad with bows). Natural armor. Large body (bigger/hitbox).
+Naiad: Oceans Grace (more HP and damage in water). Ocean Wish (weaker/slower on land). Water breathing. Water vision. Aqua affinity. Swim speed. Like water.
+Vampire: Turn other players into vampires by killing them. Daylight sensitive. Water sensitive. Leeching (heal on kill). Stronger (deal more damage). Undead mobs ignore you.
+
+=== ORIGINS-MAGIC ===
+Alchemist: Potions are stronger and last longer. Convert copper to gold and back. Unskilled warrior (less damage). Weak in water.
+Telekinetic: Reach further. Drops go straight to inventory. Unskilled warrior. Weak in water.
+Healer: Survive death once every 10 min. Right-click gives regen. Regen when standing still. Unskilled warrior. Weak in water.
+Hypnotist: Right-click monsters to make them attack your target. Right-click players for nausea. Unskilled warrior. Weak in water.
+Necromancer: Undead target what you hit. Revive dead players. Spirit strength (stronger in Nether, weaker outside). Undead ignore you. Dark aura (villagers won't trade). Weak in water.
+Spirit: Silent (sculk doesn't detect). Invisible when still. Spirit strength. Weak in water.
+Warlock: Kill boost (absorb HP from kills). Cursed strikes (hits inflict negative effects). Undead ally. No magic (can't use enchantments or potions). Dark aura. Weak in water.
+Shadowmancer: Invisible in darkness. Dark strength (more damage in dark, less in light). Double fire damage. Burn in light. No fire resistance. Weak in water.
+
+=== ORIGINS-MOBS ===
+Bee: Stinger (poison on hit every 5s). Flower power (regen near flowers). Queen bee (bees won't anger). Small bug (less HP). Bee wings. Vegetarian.
+Drowned: Trident expert (channeling without lightning, riptide without rain for 20s, 60s CD). Water vision. Guardian ally. Water combatant (more damage in water). Water breathing. Undead. Zombie hunger (faster food drain). Surface slowness. Carnivore.
+Evoker: Summon fangs. Lower totem chance (10% totem doesn't break). Pillager aligned. Illager.
+Fox: Timid creature (faster when others nearby). Better berries. Careful gatherer (berry bushes don't hurt). Item collector. Sly (faster movement). Small fox.
+Slime: Bouncy. Split (summon slime minion with hunger). Small weak (weaker at low HP). Small weak knockback. Fall immunity. Slimy color. Dyeable.
+Snow Golem: Water vulnerability. Temperature system. Overheat. Melting. Stronger snowballs. Snow trail. Frigid strength (more damage in cold).
+Strider: Fire immunity. Nether spawn. Water vulnerability. Lava walk. Surface slowness. Rideable. Strider shake. Warped fungus eater.
+Witch: Better potions (last twice as long). Potion action (auto-drink situational potion). Witch particles. Pillager aligned. Illager.
+Wolf: Wolf body (less HP). Full moon (stronger, faster, more HP). Full moon health. Full moon attack. Alpha wolf (tamed wolves stronger). Wolf howl (buff allies). Wolf pack. Wolf pack attack. Carnivore.
+Guardian: Guardian spikes (thorns). Guardian ally. Prismarine skin (armor). Surface weakness. Becomes elder guardian. Water breathing. Water vision. Aqua affinity. Swim speed. Like water. Aquatic. Conduit power on land. Air from potions.
+Elder Guardian: Unchoosable — transform from Guardian. Elder spikes (stronger thorns). Elder magic (inflict mining fatigue). Mining fatigue immune. All other Guardian powers.
+
+=== ORIGINS-MONSTERS ===
+Creeper: Creeper ally (other creepers ignore you). Explosive (double-tap sneak to explode). Fear cats (nausea/weakness near cats). No shield.
+Zombie: Land night vision. Undead ally. Undead. Burn in day. Slowness. Zombie hunger. Zombie touch (zombify villagers). Scare villagers. Transform into Husk/Drowned. Carnivore.
+Husk: Unchoosable — transform from Zombie in warm biomes. Land night vision. Apply hunger effect. Undead ally. Undead. Slowness. Cold slowness (even slower in cold). Zombie hunger. Zombie touch. Scare villagers. Can transform back to Zombie. Carnivore.
+Drowned (Monsters): Unchoosable — transform from Zombie in water. Trident expert. Water vision. Guardian ally. Water breathing. Swim speed. Water combatant. Undead. Burn in day. Zombie hunger. Zombie touch. Scare villagers. Slowness. Land slowness. Can transform back to Zombie. Carnivore.
+Skeleton: Land night vision. Infinite arrows. Undead ally. Better aim (perfect bow aim). Undead. Burn in day. Skeleton body (2 less hearts). Half max saturation. Transform into Stray.
+Stray: Unchoosable — transform from Skeleton in cold/powder snow. Infinite arrows. Freeze immune. Undead ally. Better aim. Slowness arrows. Undead. Burn in day. Skeleton body. Heat slowness. Double fire damage. Transform back to Skeleton.
+Warden: Sense movement (see creatures glow). Blindness (limited vision). Double damage. Double health. Natural armor. No shield. Sonic boom ability.
+Wither Skeleton: Apply wither effect on hit. Undead ally. Wither immunity. Undead. Skeleton body. Half max saturation. Fire immunity. Nether spawn.
+Piglin: Better gold armor (gold = diamond quality, unbreakable). Super bartering (more loot). Piglin ally. Better aim. Transform into Zombified Piglin in Overworld. Nether spawn.
+Zombified Piglin: Unchoosable — transform from Piglin in Overworld. Better gold weapons (2x power, unbreakable). Zombified piglin allies. Undead ally. Undead. Slowness. Zombie hunger. Transform back to Piglin. Nether spawn. Fire immunity.
+
+=== CORRUPTED-ASPECTS ===
+Collect mob essences with the Evergrowing Blade, store in an Essence Cage. 120 total essence units needed per Aspect, split across types. Focus items unlock active powers.
+Human: No effects. No focus ability. Requires Humanoid essence.
+Merling: Breathe underwater but not on land. Faster in water, slower on land. More trident damage. Focus: Highlight nearby wet mobs and players. Requires Aquatic essence.
+Enderian: Water is harmful. More HP/reach, 3 blocks tall. Ender pearls no self-harm. Focus: Teleport forward. Requires Void + Humanoid.
+Shulk: Half scale, half HP, more attack speed. Shell gives +4 absorption, repairs on damage. Less damage and knockback. Focus: Store/retrieve chest or barrel. Camouflage as fake block.
+Feline: Smaller, less HP, faster. Combat speed boost. Water slows. Focus: High leap.
+Infernal: Water harmful. Fire immune. More damage on fire. Passively cooks food. Focus: Set self on fire.
+Elytrian: Unique elytra. More damage while flying. Control descent. Double fall damage. Focus: Launch into air.
+Honey Bee: Unique elytra. Small with natural armor. Elytra unbreakable but slower. Store potion effects from flowers. Requires Bug + Plant.
+Rascal: ~1.2 blocks tall. Less HP. Less attack reach but more block reach. Stronger/faster in dark. Focus: Teleport down to cave below.
+Rotten: Can't drown. +2 armor. Smite vulnerability. Weaker in sunlight and unprovoked. Slower in water. Focus: Summon 4 Zombified Piglins.
+Arachnid: Bane of Arthropods vulnerability. Less HP. Higher jump, safe landing. Climb any surface including ceilings. Resistance in cobwebs. Focus: Create/remove cobwebs. Launch from walls.
+Oozeling: Extremely bouncy. Knocked around easier. Higher jumps (even more sneaking). Armor less effective. Focus: Amplify bounciness.
+
+=== POWER TRIMS 2.9 ===
+Full matching trimmed armor grants powers. Activate with Shift+F. Disrupt triggers at 8 HP (4 hearts). Passives from full set.
+Sentry: Passive — Resistance I. Active — shoot 3 spectral arrows (spread 0.15), 0.5 true damage. 90s CD.
+Dune: Passive — Haste I + Fire Res I. Active — Sandstorm: 15-block tornado, pull+lift, 2 dmg/sec, 10s. 60s CD.
+Eye: Passive — Night Vision I. Active — True Sight: reveal all entities 80 blocks (vertical 50), 30s. 120s CD.
+Coast: Passive — Dolphin's Grace I. Active — Water Burst: 10 dmg, pull, Weakness I + Slowness I 4s, 30-block radius. 60s CD.
+Wild: Passive — Regen I. Active — Vine Grapple: 60 blocks, poison 10s. 20s CD. Disrupt — Root Trap 5x3 at 8 HP, 150 ticks. 20s CD.
+Tide: Passive — Dolphin's Grace II. Active — Wave: 10 wide, 10 tall, knockback, 20 moves, 300 ticks. 120s CD.
+Snout: Passive — Strength I. Active — summon 5 Wither Skeletons (40 HP, 12 dmg, speed 0.25) 90s. 120s CD.
+Rib: Passive — Resistance I. Active — summon 3 Bogged (40 HP, 10 dmg, speed 0.25) 60s. 60s CD.
+Spire: Passive — Speed I. Active — Dash: 8 blocks, 2.0 speed, knockback 1.5, slow 3s, vuln +60% dmg 5s. 30s CD.
+Vex: Passive — Speed I. Active — 8 dmg radius 30, blind+debuff 20s. 120s CD. Disrupt — True Invisibility 10s at 8 HP. 120s CD.
+Ward: Passive — Resistance I. Active — Barrier: Absorption IV + Resistance II, 10s. 120s CD.
+Wayfinder: Passive — Fast sneak. Active — Mark location, teleport infinite range. 120s CD.
+Silence: Passive — Strength I. Active — Warden's Roar radius 15: blind/slow/hunger/glow 20s, disable pearls 10s. 90s CD. Disrupt — Warden's Echo: enemies Weak+Slow, self Resist+Regen, 6-block radius. 120s CD.
+Raiser: Passive — No fall damage. Active — Shockwave: pull all 15 blocks, boost up, disable pearls 10s. 120s CD.
+Host: Passive — Most mobs ignore you. Active — steal 4 HP (2 hearts) + effects, radius 10. 120s CD.
+Flow: Passive — Speed I. Active — Fly 20s, 1 heart/sec, no mace bonus. 60s CD.
+Bolt: Passive — Speed II. Active — Chain lightning: 3 targets, initial 6 dmg, chain 4 dmg, Weakness I 5s, range 20. 20s CD.
+Shaper: No abilities.
+Mythic Rituals: /upgrade opens Ritual menu. Upgrade armor with catalyst items. Build Rage/Charge by fighting (max 100-150). Shift+1 to transform. Ultimates available for: Silence (Warden — 150 rage, 40s, sub-abilities: Boom/Grasp/Leap via Shift+7/8/9), Wild (Overgrowth — 150 charge, 15s, scale 1.3, 30 HP, sub-abilities: Slam/Ensnare/Toxin), Coast (Tidal Lord — 100 charge, 20s, scale 1.2, 40 HP, sub-abilities: Trident/Beam/Dash), Tide (Guardian — 100 charge, 20s, scale 1.15, 30 HP, sub-abilities: Guardian/Water Wall/Vortex/Depth Charge/Blessing).
+Tool Trims (experimental): Apply trims to tools for weapon-specific abilities (melee, ranged, trident, shield, tool). Enabled templates: bolt, silence, wild, vex, dune, ward, coast, wayfinder. Disabled by default.
+Commands: /ptconfig (admin), /upgrade (rituals), /trust <player>, /untrust <player>, /trustlist, /pt resetcooldown.
+`;
+
+function addMsg(role, text, sender) {
+  const area = document.getElementById('msg-area');
+  const typingEl = document.getElementById('typing-el');
+  if (typingEl) typingEl.remove();
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+  if (sender) { const s = document.createElement('div'); s.className = 'sender'; s.textContent = sender; d.appendChild(s); }
+  const t = document.createElement('div'); t.className = 'text'; t.textContent = text; d.appendChild(t);
+  const tm = document.createElement('div'); tm.className = 'time';
+  const n = new Date();
+  tm.textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+  d.appendChild(tm);
+  area.appendChild(d);
+  area.scrollTop = area.scrollHeight;
+}
+
+function showTyping() {
+  const area = document.getElementById('msg-area');
+  const el = document.getElementById('typing-el');
+  if (el) el.remove();
+  const d = document.createElement('div'); d.id = 'typing-el';
+  d.className = 'msg bot';
+  d.innerHTML = '<div class="sender">MTM</div><div class="text"><span class="typing-dots"><span></span><span></span><span></span></span></div>';
+  area.appendChild(d);
+  area.scrollTop = area.scrollHeight;
+}
+
+async function send() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text || loading) return;
+  input.value = '';
+  addMsg('user', text, 'Admin');
+  msgHistory.push({ role: 'user', content: text });
+  loading = true; input.disabled = true;
+  document.getElementById('send-btn').disabled = true;
+  showTyping();
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: MODEL,
+        playerName: 'Admin',
+        messages: [{ role: 'system', content: SYSTEM }, ...msgHistory],
+        max_tokens: 2048,
+        temperature: 0.7,
+      })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const reply = data.choices[0].message.content;
+    addMsg('bot', reply, 'MTM');
+    msgHistory.push({ role: 'assistant', content: reply });
+  } catch (e) {
+    addMsg('bot', '⚠ Error: ' + e.message, 'MTM');
+  }
+  loading = false; input.disabled = false;
+  document.getElementById('send-btn').disabled = false;
+  input.focus();
+}
+
+document.getElementById('msg-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+});
+
+// ===== Logs =====
+let allLogs = [];
+
+async function loadLogs() {
+  document.querySelector('.log-refresh').textContent = 'Loading...';
+  try {
+    const res = await fetch('/api/chat?pw=' + encodeURIComponent(ADMIN_PW));
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    allLogs = await res.json();
+    document.getElementById('log-count').textContent = allLogs.length + ' total logs';
+    filterLogs();
+  } catch (e) {
+    document.getElementById('log-body').innerHTML = '<tr><td colspan="4" class="no-logs">Failed to load logs: ' + e.message + '</td></tr>';
+  }
+  document.querySelector('.log-refresh').textContent = 'Refresh';
+}
+
+function filterLogs() {
+  const filter = document.getElementById('filter-player').value.toLowerCase().trim();
+  const limit = parseInt(document.getElementById('filter-limit').value);
+  let filtered = allLogs;
+  if (filter) filtered = filtered.filter(l => l.player.toLowerCase().includes(filter));
+  if (limit > 0) filtered = filtered.slice(-limit);
+  document.getElementById('filter-count').textContent = filtered.length + ' shown';
+
+  let html = '';
+  if (filtered.length === 0) {
+    html = '<tr><td colspan="4" class="no-logs">No logs found.</td></tr>';
+  } else {
+    for (const log of filtered) {
+      const time = log.timestamp ? new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '?';
+      const msg = log.message || '';
+      const reply = log.response || '';
+      html += `<tr data-id="${log.id}" onclick="toggleDetail(${log.id})">
+        <td class="col-time">${time}</td>
+        <td class="col-player">${esc(log.player)}</td>
+        <td class="col-msg">${esc(msg.slice(0, 80))}${msg.length > 80 ? '…' : ''}</td>
+        <td class="col-reply">${esc(reply.slice(0, 80))}${reply.length > 80 ? '…' : ''}</td>
+      </tr>`;
+    }
+  }
+  document.getElementById('log-body').innerHTML = html;
+}
+
+let detailOpen = null;
+function toggleDetail(id) {
+  const existing = document.querySelector(`tr.detail-row[data-parent="${id}"]`);
+  if (existing) { existing.remove(); detailOpen = null; return; }
+  const row = document.querySelector(`tr[data-id="${id}"]`);
+  if (!row) return;
+  const log = allLogs.find(l => l.id === id);
+  if (!log) return;
+  const detail = document.createElement('tr');
+  detail.className = 'detail-row';
+  detail.dataset.parent = id;
+  detail.innerHTML = `<td colspan="4">
+    <div class="label">Message</div><div class="full-text">${esc(log.message || '')}</div>
+    <div class="label" style="margin-top:10px;">Response</div><div class="full-text">${esc(log.response || '')}</div>
+    <div class="label" style="margin-top:6px;">${new Date(log.timestamp).toLocaleString()} · ${log.tokens || 0} tokens</div>
+  </td>`;
+  row.after(detail);
+  detailOpen = id;
+}
+
+function esc(s) {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>
