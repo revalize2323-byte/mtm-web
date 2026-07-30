@@ -1,4 +1,10 @@
-const { getStore } = require('@netlify/blobs');
+let getStore = null;
+try {
+  const blobs = require('@netlify/blobs');
+  getStore = blobs.getStore;
+} catch (e) {
+  console.error('[MTM] Blobs unavailable:', e.message);
+}
 
 const CEREBRAS_KEY = 'csk-v8rnfxfyyx9jky56crrfm26dmn4kfnj545f4y9d99j3ccyj3';
 const CEREBRAS_URL = 'https://api.cerebras.ai/v1/chat/completions';
@@ -12,19 +18,23 @@ const headers = {
 };
 
 function getDataStore() {
-  return getStore('mtm-data');
+  if (!getStore) return null;
+  try { return getStore('mtm-data'); } catch (e) { return null; }
 }
 
 function getLogStore() {
-  return getStore('mtm-logs');
+  if (!getStore) return null;
+  try { return getStore('mtm-logs'); } catch (e) { return null; }
 }
 
 async function getJSON(store, key, fallback = null) {
+  if (!store) return fallback;
   const raw = await store.get(key);
   return raw ? JSON.parse(raw) : fallback;
 }
 
 async function setJSON(store, key, data) {
+  if (!store) return;
   await store.set(key, JSON.stringify(data));
 }
 
@@ -36,6 +46,7 @@ async function getXP(player) {
 
 async function addXP(player, amount) {
   const store = getDataStore();
+  if (!store) return null;
   const all = await getJSON(store, 'xp', {});
   const p = all[player] || { xp: 0, level: 1, chats: 0, lastCheckIn: null, streak: 0 };
   p.xp += amount;
@@ -58,11 +69,18 @@ exports.handler = async function (event) {
   // ---- GET endpoints ----
   if (event.httpMethod === 'GET') {
     try {
+      // Health check
+      if (action === 'ping') {
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: true, blobs: !!getStore }) };
+      }
+
       const store = getDataStore();
 
       // Public conversations
       if (action === 'conversations') {
-        const raw = await getLogStore().get('public-conversations');
+        const ls = getLogStore();
+        if (!ls) return { statusCode: 200, headers, body: '[]' };
+        const raw = await ls.get('public-conversations');
         return { statusCode: 200, headers, body: raw || '[]' };
       }
 
@@ -100,7 +118,9 @@ exports.handler = async function (event) {
 
       // Admin logs
       if (q.pw === ADMIN_PW) {
-        const raw = await getLogStore().get('logs');
+        const ls = getLogStore();
+        if (!ls) return { statusCode: 200, headers, body: '[]' };
+        const raw = await ls.get('logs');
         return { statusCode: 200, headers, body: raw || '[]' };
       }
 
@@ -284,34 +304,31 @@ exports.handler = async function (event) {
 
       console.log(`[MTM] Reply to ${body.playerName || '?'}: "${reply.slice(0, 80)}"`);
 
-      // Fire-and-forget: blob logging + XP (don't block response)
-      const ctx = { body, reply, data };
-      setTimeout(async () => {
+      // Log + XP (async, don't block response)
+      (async () => {
         try {
           const logStore = getLogStore();
-          const raw = await logStore.get('logs');
-          const logs = raw ? JSON.parse(raw) : [];
-          const userMsgs = ctx.body.messages?.filter(m => m.role === 'user');
-          logs.push({
-            id: Date.now(),
-            timestamp: new Date().toISOString(),
-            player: ctx.body.playerName || 'unknown',
-            message: userMsgs?.[userMsgs.length - 1]?.content || '',
-            response: ctx.reply,
-            tokens: ctx.data.usage?.total_tokens || 0,
-          });
-          await logStore.set('logs', JSON.stringify(logs.slice(-1000)));
-        } catch (logErr) {
-          console.error('[MTM] Log store error:', logErr.message);
-        }
-        if (ctx.body.playerName) {
-          try {
-            await addXP(ctx.body.playerName, 5);
-          } catch (xpErr) {
-            console.error('[MTM] XP error:', xpErr.message);
+          if (logStore) {
+            const raw = await logStore.get('logs');
+            const logs = raw ? JSON.parse(raw) : [];
+            const userMsgs = body.messages?.filter(m => m.role === 'user');
+            logs.push({
+              id: Date.now(),
+              timestamp: new Date().toISOString(),
+              player: body.playerName || 'unknown',
+              message: userMsgs?.[userMsgs.length - 1]?.content || '',
+              response: reply,
+              tokens: data.usage?.total_tokens || 0,
+            });
+            await logStore.set('logs', JSON.stringify(logs.slice(-1000)));
           }
+          if (body.playerName) {
+            await addXP(body.playerName, 5);
+          }
+        } catch (bgErr) {
+          console.error('[MTM] Background error:', bgErr.message);
         }
-      }, 0);
+      })();
 
       return { statusCode: res.status, headers, body: JSON.stringify(data) };
     } catch (e) {
