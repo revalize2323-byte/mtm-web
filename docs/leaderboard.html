@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaderboard — MTM</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a1a; color: #e0e0ff;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+}
+header {
+  padding: 20px 24px; border-bottom: 1px solid rgba(224,64,251,0.1);
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+header h1 {
+  font-size: 24px; font-weight: 200;
+  background: linear-gradient(135deg, #e040fb, #ff69b4);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+header .back { color: rgba(224,64,251,0.5); text-decoration: none; font-size: 14px; }
+header .back:hover { color: #e040fb; }
+header .sub { color: rgba(124,77,255,0.5); font-size: 13px; margin-left: auto; }
+
+.content { display: flex; gap: 20px; padding: 20px 24px; flex-wrap: wrap; }
+.leaderboard { flex: 2; min-width: 300px; }
+.stats-panel { flex: 1; min-width: 250px; }
+
+.section-title { font-size: 15px; font-weight: 600; color: rgba(124,77,255,0.8); margin-bottom: 12px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  padding: 10px 12px; text-align: left; font-weight: 600;
+  color: rgba(124,77,255,0.6); border-bottom: 1px solid rgba(224,64,251,0.1);
+  position: sticky; top: 0; background: #0a0a1a;
+}
+td { padding: 10px 12px; border-bottom: 1px solid rgba(224,64,251,0.04); }
+tr:hover td { background: rgba(224,64,251,0.03); }
+tr.top1 td { color: #ffd700; }
+tr.top2 td { color: #c0c0c0; }
+tr.top3 td { color: #cd7f32; }
+.rank { font-weight: 700; width: 40px; }
+.player-cell { color: #ce93d8; font-weight: 600; }
+.xp-bar { display: inline-block; height: 4px; border-radius: 2px; background: linear-gradient(90deg, #9c27b0, #e040fb); vertical-align: middle; margin-right: 6px; }
+
+.stats-card {
+  background: rgba(26,26,46,0.4); border: 1px solid rgba(224,64,251,0.08);
+  border-radius: 12px; padding: 20px; margin-bottom: 12px;
+}
+.stats-card h3 { font-size: 15px; margin-bottom: 8px; }
+.stats-card .stat-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px solid rgba(224,64,251,0.04); }
+.stats-card .stat-row .label { color: rgba(124,77,255,0.5); }
+.stats-card .stat-row .value { color: #e0e0ff; font-weight: 600; }
+.stats-card input {
+  background: rgba(26,26,46,0.5); border: 1px solid rgba(224,64,251,0.2);
+  padding: 10px 14px; border-radius: 8px; color: #e0e0ff;
+  font-size: 13px; outline: none; width: 100%; margin-top: 8px;
+}
+.stats-card input:focus { border-color: #e040fb; }
+.stats-card .btn {
+  display: block; margin-top: 8px; padding: 10px 20px;
+  background: linear-gradient(135deg, #9c27b0, #e040fb);
+  color: white; border: none; border-radius: 8px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.stats-card .btn:hover { box-shadow: 0 0 16px rgba(224,64,251,0.3); }
+.stats-card .btn:disabled { opacity: 0.4; cursor: default; }
+
+.level-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 6px;
+  background: rgba(224,64,251,0.15); color: #e040fb; font-size: 11px; font-weight: 600;
+}
+
+.loading { text-align: center; padding: 40px; color: rgba(124,77,255,0.3); font-size: 14px; }
+.no-data { text-align: center; padding: 40px; color: rgba(124,77,255,0.3); font-size: 13px; }
+
+@media (max-width: 600px) {
+  .content { flex-direction: column-reverse; }
+}
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="/">← MTM</a>
+  <h1>Leaderboard</h1>
+  <span class="sub" id="total-players"></span>
+</header>
+<div class="content">
+  <div class="leaderboard">
+    <div class="section-title">🏆 Top Chatters</div>
+    <div id="lb-loading" class="loading">Loading...</div>
+    <div id="lb-table" style="display:none;">
+      <table><thead><tr><th class="rank">#</th><th>Player</th><th>Level</th><th>XP</th><th>Chats</th><th>Streak</th></tr></thead><tbody id="lb-body"></tbody></table>
+    </div>
+    <div id="lb-empty" class="no-data" style="display:none;">No data yet. Start chatting to earn XP!</div>
+  </div>
+  <div class="stats-panel">
+    <div class="stats-card">
+      <h3>🔍 Look Up Player</h3>
+      <input id="lookup-input" type="text" placeholder="Enter IGN..." maxlength="16">
+      <button class="btn" onclick="lookupPlayer()">Search</button>
+    </div>
+    <div class="stats-card" id="player-stats" style="display:none;">
+      <h3 id="ps-name"></h3>
+      <div class="stat-row"><span class="label">Level</span><span class="value"><span class="level-badge" id="ps-level"></span></span></div>
+      <div class="stat-row"><span class="label">XP</span><span class="value" id="ps-xp"></span></div>
+      <div class="stat-row"><span class="label">Chats</span><span class="value" id="ps-chats"></span></div>
+      <div class="stat-row"><span class="label">Check-In Streak</span><span class="value" id="ps-streak"></span></div>
+    </div>
+  </div>
+</div>
+<script>
+const API_URL = '/api/chat';
+
+async function loadLeaderboard() {
+  const loading = document.getElementById('lb-loading');
+  const table = document.getElementById('lb-table');
+  const empty = document.getElementById('lb-empty');
+  const body = document.getElementById('lb-body');
+
+  loading.style.display = '';
+  table.style.display = 'none';
+  empty.style.display = 'none';
+
+  try {
+    const res = await fetch(API_URL + '?action=leaderboard');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    loading.style.display = 'none';
+
+    if (!data || data.length === 0) {
+      empty.style.display = '';
+      document.getElementById('total-players').textContent = '0 players';
+      return;
+    }
+
+    document.getElementById('total-players').textContent = data.length + ' players';
+    table.style.display = '';
+
+    body.innerHTML = data.map((p, i) => {
+      const cls = i < 3 ? 'top' + (i+1) : '';
+      const medals = ['🥇','🥈','🥉'];
+      const rank = i < 3 ? medals[i] : '#' + (i+1);
+      const maxXp = Math.max(...data.map(x => x.xp || 0), 1);
+      const bar = '<span class="xp-bar" style="width:' + Math.round(((p.xp||0)/maxXp)*100) + 'px"></span>';
+      return '<tr class="' + cls + '"><td class="rank">' + rank + '</td><td class="player-cell">' + esc(p.player) + '</td><td><span class="level-badge">' + (p.level || 1) + '</span></td><td>' + bar + (p.xp || 0) + '</td><td>' + (p.chats || 0) + '</td><td>' + (p.streak || 0) + '🔥</td></tr>';
+    }).join('');
+  } catch(e) {
+    loading.textContent = 'Failed to load: ' + e.message;
+  }
+}
+
+async function lookupPlayer() {
+  const name = document.getElementById('lookup-input').value.trim();
+  if (!name) return;
+  const card = document.getElementById('player-stats');
+  card.style.display = 'none';
+
+  try {
+    const res = await fetch(API_URL + '?action=stats&player=' + encodeURIComponent(name));
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data || !data.xp && data.xp !== 0) {
+      document.getElementById('ps-name').textContent = name + ' — No data yet';
+      card.style.display = '';
+      document.getElementById('ps-level').textContent = '-';
+      document.getElementById('ps-xp').textContent = '0';
+      document.getElementById('ps-chats').textContent = '0';
+      document.getElementById('ps-streak').textContent = '0';
+      return;
+    }
+    document.getElementById('ps-name').textContent = name;
+    document.getElementById('ps-level').textContent = data.level || 1;
+    document.getElementById('ps-xp').textContent = data.xp || 0;
+    document.getElementById('ps-chats').textContent = data.chats || 0;
+    document.getElementById('ps-streak').textContent = (data.streak || 0) + '🔥';
+    card.style.display = '';
+  } catch(e) {
+    document.getElementById('ps-name').textContent = 'Error: ' + e.message;
+    card.style.display = '';
+  }
+}
+
+document.getElementById('lookup-input').addEventListener('keydown', e => { if (e.key === 'Enter') lookupPlayer(); });
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+loadLeaderboard();
+</script>
+</body>
+</html>

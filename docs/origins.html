@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Origins Browser — MTM</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a1a; color: #e0e0ff;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+}
+header {
+  padding: 20px 24px; border-bottom: 1px solid rgba(224,64,251,0.1);
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+header h1 {
+  font-size: 24px; font-weight: 200;
+  background: linear-gradient(135deg, #e040fb, #ff69b4);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+header .back { color: rgba(224,64,251,0.5); text-decoration: none; font-size: 14px; }
+header .back:hover { color: #e040fb; }
+.controls {
+  display: flex; gap: 10px; padding: 16px 24px;
+  border-bottom: 1px solid rgba(224,64,251,0.06); flex-wrap: wrap;
+}
+.controls input, .controls select {
+  background: rgba(26,26,46,0.5); border: 1px solid rgba(224,64,251,0.2);
+  padding: 10px 14px; border-radius: 8px; color: #e0e0ff;
+  font-size: 13px; outline: none;
+}
+.controls input:focus, .controls select:focus { border-color: #e040fb; }
+.controls input { flex-grow: 1; min-width: 200px; }
+.controls .count { font-size: 12px; color: rgba(124,77,255,0.5); align-self: center; }
+.grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px; padding: 20px 24px;
+}
+.card {
+  background: rgba(26,26,46,0.4); border: 1px solid rgba(224,64,251,0.08);
+  border-radius: 12px; padding: 16px; transition: all 0.3s; cursor: default;
+}
+.card:hover { border-color: rgba(224,64,251,0.2); background: rgba(26,26,46,0.6); }
+.card .badge {
+  display: inline-block; font-size: 10px; padding: 2px 8px;
+  border-radius: 6px; margin-bottom: 6px; font-weight: 600;
+}
+.card .badge.reborn { background: rgba(156,39,176,0.2); color: #ce93d8; }
+.card .badge.fantasy { background: rgba(233,30,99,0.2); color: #f48fb1; }
+.card .badge.magic { background: rgba(0,150,136,0.2); color: #80cbc4; }
+.card .badge.mobs { background: rgba(255,152,0,0.2); color: #ffcc80; }
+.card .badge.monsters { background: rgba(244,67,54,0.2); color: #ef9a9a; }
+.card .badge.corrupted { background: rgba(63,81,181,0.2); color: #9fa8da; }
+.card h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.card p { font-size: 13px; line-height: 1.5; color: rgba(224,224,255,0.7); }
+.no-results { text-align: center; padding: 60px; color: rgba(124,77,255,0.3); font-size: 16px; grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="/">← MTM</a>
+  <h1>Origins Browser</h1>
+</header>
+<div class="controls">
+  <input id="search" type="text" placeholder="Search origins..." oninput="filter()">
+  <select id="pack-filter" onchange="filter()">
+    <option value="all">All Packs</option>
+    <option value="reborn">Reborn</option>
+    <option value="fantasy">Fantasy</option>
+    <option value="magic">Magic</option>
+    <option value="mobs">Mobs</option>
+    <option value="monsters">Monsters</option>
+    <option value="corrupted">Corrupted Aspects</option>
+  </select>
+  <span class="count" id="count"></span>
+  <button onclick="randomOrigin()" style="padding:8px 18px;background:linear-gradient(135deg,#9c27b0,#e040fb);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;">🎲 Random</button>
+</div>
+<div class="grid" id="grid"></div>
+<script>
+const origins = [
+  // Reborn
+  { name:'Arachnid', pack:'reborn', desc:'Climb walls and ceilings. Shoot webs. Carnivore. Fragile. Arthropod.' },
+  { name:'Avian', pack:'reborn', desc:'Slow fall. Fresh air regen. Tailwind speed. Lay eggs. Vegetarian. No chestplate.' },
+  { name:'Blazeborn', pack:'reborn', desc:'Fire immune. Nether spawn. Burning wrath. Hotblooded. Water vuln.' },
+  { name:'Elytrian', pack:'reborn', desc:'Elytra. Launch. Aerial combat. Light armor. Claustrophobia.' },
+  { name:'Enderian', pack:'reborn', desc:'Throw pearls. Water vuln. Extra reach. Pumpkin hate.' },
+  { name:'Feline', pack:'reborn', desc:'Fall immune. Sprint jump. Velvet paws. Nine lives. Weak arms.' },
+  { name:'Merling', pack:'reborn', desc:'Water breathing. Conduit. Aqua affinity. Swim speed.' },
+  { name:'Phantom', pack:'reborn', desc:'Phantomize. Phase. Invisible. Burn in day. Hunger. Fragile.' },
+  { name:'Shulk', pack:'reborn', desc:'Shulker inventory. Natural armor. Strong arms. No shield.' },
+  { name:'Human', pack:'reborn', desc:'No powers. Ordinary Minecraft experience.' },
+  // Fantasy
+  { name:'Bard', pack:'fantasy', desc:'Elegy more dmg low HP. Note block regen. Duplicate allays.' },
+  { name:'Centaur', pack:'fantasy', desc:'Mounted. Super jump. Speed. Full moon stronger. Perfect bow.' },
+  { name:'Dragonborn', pack:'fantasy', desc:'Dragon breath bottles. Stronger End. End crystal heal. Fireball.' },
+  { name:'Dwarf', pack:'fantasy', desc:'Haste. Night vision. Fortune. Magic resist. 1 block tall.' },
+  { name:'Elf', pack:'fantasy', desc:'Perfect bow. Arrow boost. Bow burst.' },
+  { name:'Gargoyle', pack:'fantasy', desc:'Stone skin. Knockback immune. Slow. Fire resist. Heavy blow.' },
+  { name:'Giant', pack:'fantasy', desc:'Double HP. Heavy blow. Poor shot. Large. Natural armor.' },
+  { name:'Naiad', pack:'fantasy', desc:'Ocean grace. Ocean wish. Water breathing. Swim speed.' },
+  { name:'Vampire', pack:'fantasy', desc:'Turn players. Day/water sensitive. Leech. Stronger. Undead ignore.' },
+  // Magic
+  { name:'Alchemist', pack:'magic', desc:'Stronger potions. Copper↔gold. Unskilled warrior.' },
+  { name:'Telekinetic', pack:'magic', desc:'Reach. Drops to inventory. Unskilled warrior.' },
+  { name:'Healer', pack:'magic', desc:'Survive death 10min. Regen click. Regen still. Unskilled.' },
+  { name:'Hypnotist', pack:'magic', desc:'Control mobs. Nausea players. Unskilled warrior.' },
+  { name:'Necromancer', pack:'magic', desc:'Undead target. Revive players. Spirit strength. Undead ignore.' },
+  { name:'Spirit', pack:'magic', desc:'Silent. Invisible still. Spirit strength.' },
+  { name:'Warlock', pack:'magic', desc:'Kill boost. Cursed strikes. Undead ally. No magic. Dark aura.' },
+  { name:'Shadowmancer', pack:'magic', desc:'Invisible dark. Dark strength. Double fire. Burn in light.' },
+  // Mobs
+  { name:'Bee', pack:'mobs', desc:'Stinger 5s. Flower power. Queen bee. Small. Bee wings.' },
+  { name:'Drowned', pack:'mobs', desc:'Trident expert. Water vision. Guardian ally. Undead. Carnivore.' },
+  { name:'Evoker', pack:'mobs', desc:'Summon fangs. Lower totem. Illager.' },
+  { name:'Fox', pack:'mobs', desc:'Timid. Better berries. Gatherer. Collector. Sly. Small.' },
+  { name:'Slime', pack:'mobs', desc:'Bouncy. Split. Small weak. Fall immune. Dyeable.' },
+  { name:'Snow Golem', pack:'mobs', desc:'Water vuln. Temperature. Overheat. Melt. Snow trail.' },
+  { name:'Strider', pack:'mobs', desc:'Fire immune. Nether spawn. Lava walk. Surface slow. Rideable.' },
+  { name:'Witch', pack:'mobs', desc:'Better potions. Potion action. Illager.' },
+  { name:'Wolf', pack:'mobs', desc:'Less HP. Full moon. Alpha wolf. Howl. Carnivore.' },
+  { name:'Guardian', pack:'mobs', desc:'Spikes. Guardian ally. Prismarine skin. Surface weak.' },
+  { name:'Elder Guardian', pack:'mobs', desc:'Transform from Guardian. Elder spikes. Mining fatigue immune.' },
+  // Monsters
+  { name:'Creeper', pack:'monsters', desc:'Creeper ally. Explosive. Fear cats. No shield.' },
+  { name:'Zombie', pack:'monsters', desc:'Night vision. Undead ally. Burn day. Zombie touch.' },
+  { name:'Husk', pack:'monsters', desc:'From Zombie warm. Hunger. Undead. Cold slow.' },
+  { name:'Drowned', pack:'monsters', desc:'From Zombie water. Trident expert. Water combat. Undead.' },
+  { name:'Skeleton', pack:'monsters', desc:'Night vision. Infinite arrows. Better aim. Burn day. 2 less hearts.' },
+  { name:'Stray', pack:'monsters', desc:'From Skeleton cold. Slowness arrows. Freeze immune.' },
+  { name:'Warden', pack:'monsters', desc:'Sense movement. Blindness. Double dmg/HP. Sonic boom.' },
+  { name:'Wither Skeleton', pack:'monsters', desc:'Wither hit. Wither immune. Fire immune. Nether spawn.' },
+  { name:'Piglin', pack:'monsters', desc:'Better gold armor. Super barter. Piglin ally.' },
+  { name:'Zombified Piglin', pack:'monsters', desc:'From Piglin. Better gold weapons. Undead.' },
+  // Corrupted Aspects
+  { name:'Human (CA)', pack:'corrupted', desc:'No effects. No focus. Humanoid essence.' },
+  { name:'Merling (CA)', pack:'corrupted', desc:'Water breathing. Trident dmg. Focus: highlight wet.' },
+  { name:'Enderian (CA)', pack:'corrupted', desc:'Water harm. More HP/reach. Focus: teleport.' },
+  { name:'Shulk (CA)', pack:'corrupted', desc:'Half scale/HP. Shell +4. Focus: chest/bucket.' },
+  { name:'Feline (CA)', pack:'corrupted', desc:'Smaller. Faster. Combat speed. Focus: leap.' },
+  { name:'Infernal', pack:'corrupted', desc:'Water harm. Fire immune. Cook food. Focus: self fire.' },
+  { name:'Elytrian (CA)', pack:'corrupted', desc:'Elytra. More dmg flying. Focus: launch.' },
+  { name:'Honey Bee', pack:'corrupted', desc:'Elytra. Small. Natural armor. Flower potions.' },
+  { name:'Rascal', pack:'corrupted', desc:'1.2 tall. Less HP. Block reach. Focus: cave tp.' },
+  { name:'Rotten', pack:'corrupted', desc:'No drown. +2 armor. Smite vuln. Focus: piglins.' },
+  { name:'Arachnid (CA)', pack:'corrupted', desc:'Bane vuln. Less HP. Climb. Focus: webs.' },
+  { name:'Oozeling', pack:'corrupted', desc:'Bouncy. Higher jumps. Armor weak. Focus: bounce.' },
+];
+
+const grid = document.getElementById('grid');
+const count = document.getElementById('count');
+
+function filter() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const pack = document.getElementById('pack-filter').value;
+  const filtered = origins.filter(o => {
+    if (pack !== 'all' && o.pack !== pack) return false;
+    if (q && !o.name.toLowerCase().includes(q) && !o.desc.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  count.textContent = filtered.length + ' origins';
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="no-results">No origins match your search.</div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(o =>
+    '<div class="card"><span class="badge ' + o.pack + '">' + o.pack + '</span><h3>' + o.name + '</h3><p>' + o.desc + '</p></div>'
+  ).join('');
+}
+filter();
+
+function randomOrigin() {
+  const i = Math.floor(Math.random() * origins.length);
+  const o = origins[i];
+  document.getElementById('search').value = '';
+  document.getElementById('pack-filter').value = 'all';
+  filter();
+  const cards = document.querySelectorAll('.card');
+  if (cards[i]) { cards[i].scrollIntoView({ behavior:'smooth', block:'center' }); cards[i].style.borderColor = '#e040fb'; setTimeout(() => cards[i].style.borderColor = '', 2000); }
+}
+</script>
+</body>
+</html>

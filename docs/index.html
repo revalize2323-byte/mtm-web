@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="purple">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +7,78 @@
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+:root, [data-theme="purple"] {
+  --bg: #0a0a1a;
+  --bg2: #1a1a2e;
+  --bg3: #0a0a1a;
+  --text: #e0e0ff;
+  --text2: rgba(124,77,255,0.7);
+  --text3: rgba(124,77,255,0.4);
+  --accent: #9c27b0;
+  --accent2: #e040fb;
+  --accent3: #ff69b4;
+  --glow: rgba(224,64,251,0.3);
+  --glow2: rgba(224,64,251,0.15);
+  --border: rgba(224,64,251,0.15);
+  --border2: rgba(224,64,251,0.3);
+  --msg-user: linear-gradient(135deg, rgba(106,27,154,0.7), rgba(156,39,176,0.5));
+  --msg-bot: rgba(26,26,46,0.5);
+  --hover: rgba(224,64,251,0.06);
+  --scrollbar: rgba(224,64,251,0.3);
+  --skeleton: linear-gradient(90deg, transparent, rgba(224,64,251,0.08), transparent);
+}
+[data-theme="nether"] {
+  --bg: #1a0a0a; --bg2: #2e1a1a; --bg3: #1a0a0a;
+  --text: #ffd0c0; --text2: rgba(255,68,68,0.7); --text3: rgba(255,68,68,0.4);
+  --accent: #b71c1c; --accent2: #ff4444; --accent3: #ff8800;
+  --glow: rgba(255,68,68,0.3); --glow2: rgba(255,68,68,0.15);
+  --border: rgba(255,68,68,0.15); --border2: rgba(255,68,68,0.3);
+  --msg-user: linear-gradient(135deg, rgba(183,28,28,0.7), rgba(255,68,68,0.5));
+  --msg-bot: rgba(46,26,26,0.5);
+  --hover: rgba(255,68,68,0.06);
+  --scrollbar: rgba(255,68,68,0.3);
+  --skeleton: linear-gradient(90deg, transparent, rgba(255,68,68,0.08), transparent);
+}
+[data-theme="ender"] {
+  --bg: #0a0a1a; --bg2: #0a1a0a; --bg3: #0a0a1a;
+  --text: #c0ffc0; --text2: rgba(0,230,118,0.7); --text3: rgba(0,230,118,0.4);
+  --accent: #00897b; --accent2: #00e676; --accent3: #69f0ae;
+  --glow: rgba(0,230,118,0.3); --glow2: rgba(0,230,118,0.15);
+  --border: rgba(0,230,118,0.15); --border2: rgba(0,230,118,0.3);
+  --msg-user: linear-gradient(135deg, rgba(0,137,123,0.7), rgba(0,230,118,0.5));
+  --msg-bot: rgba(10,26,10,0.5);
+  --hover: rgba(0,230,118,0.06);
+  --scrollbar: rgba(0,230,118,0.3);
+  --skeleton: linear-gradient(90deg, transparent, rgba(0,230,118,0.08), transparent);
+}
+[data-theme="ocean"] {
+  --bg: #0a0a1a; --bg2: #0a1a2e; --bg3: #0a0a1a;
+  --text: #c0e0ff; --text2: rgba(64,196,255,0.7); --text3: rgba(64,196,255,0.4);
+  --accent: #0277bd; --accent2: #40c4ff; --accent3: #80deea;
+  --glow: rgba(64,196,255,0.3); --glow2: rgba(64,196,255,0.15);
+  --border: rgba(64,196,255,0.15); --border2: rgba(64,196,255,0.3);
+  --msg-user: linear-gradient(135deg, rgba(2,119,189,0.7), rgba(64,196,255,0.5));
+  --msg-bot: rgba(10,26,46,0.5);
+  --hover: rgba(64,196,255,0.06);
+  --scrollbar: rgba(64,196,255,0.3);
+  --skeleton: linear-gradient(90deg, transparent, rgba(64,196,255,0.08), transparent);
+}
+[data-theme="classic"] {
+  --bg: #1a1a1a; --bg2: #2d2d2d; --bg3: #1a1a1a;
+  --text: #c0c0c0; --text2: rgba(138,186,74,0.7); --text3: rgba(138,186,74,0.4);
+  --accent: #5a7a3a; --accent2: #8aba4a; --accent3: #6a9a3a;
+  --glow: rgba(138,186,74,0.3); --glow2: rgba(138,186,74,0.15);
+  --border: rgba(138,186,74,0.15); --border2: rgba(138,186,74,0.3);
+  --msg-user: linear-gradient(135deg, rgba(74,58,42,0.7), rgba(90,122,58,0.5));
+  --msg-bot: rgba(30,30,30,0.5);
+  --hover: rgba(138,186,74,0.06);
+  --scrollbar: rgba(138,186,74,0.3);
+  --skeleton: linear-gradient(90deg, transparent, rgba(138,186,74,0.08), transparent);
+}
+
 body {
-  background: #0a0a1a;
-  color: #e0e0ff;
+  background: var(--bg);
+  color: var(--text);
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   height: 100vh;
   display: flex;
@@ -17,412 +86,881 @@ body {
   align-items: center;
   overflow: hidden;
   position: relative;
+  transition: background 0.4s;
 }
 
 #stars {
-  position: fixed;
-  top: 0; left: 0;
+  position: fixed; top: 0; left: 0;
   width: 100%; height: 100%;
-  z-index: 0;
-  pointer-events: none;
+  z-index: 0; pointer-events: none;
 }
 
-/* ---- Join Screen ---- */
+/* ---- Animated Homepage (Join Screen) ---- */
 #join-screen {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  padding: 20px;
-  animation: fadeIn 1s ease;
-}
-#join-screen h1 {
-  font-size: 56px;
-  font-weight: 200;
-  letter-spacing: 6px;
-  margin-bottom: 5px;
-  background: linear-gradient(135deg, #e040fb, #7c4dff, #ff69b4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 40px rgba(224, 64, 251, 0.3);
-}
-#join-screen .sub {
-  color: rgba(124, 77, 255, 0.8);
-  font-size: 14px;
-  margin-bottom: 35px;
-  letter-spacing: 1px;
-}
-#join-screen .input-wrap {
-  position: relative;
-  display: inline-block;
-}
-#join-screen input {
-  background: rgba(26, 26, 46, 0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(224, 64, 251, 0.3);
-  padding: 14px 20px;
-  border-radius: 12px;
-  color: #e0e0ff;
-  font-size: 16px;
-  width: 280px;
-  outline: none;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-#join-screen input:focus {
-  border-color: #e040fb;
-  box-shadow: 0 0 20px rgba(224, 64, 251, 0.2);
-}
-#join-screen input::placeholder { color: rgba(74, 20, 140, 0.6); }
-#join-screen .btn {
-  display: block;
-  margin: 18px auto 0;
-  padding: 14px 50px;
-  background: linear-gradient(135deg, #9c27b0, #e040fb);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
+  position: relative; z-index: 1;
+  width: 100%; height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  animation: fadeIn 0.8s ease;
   overflow: hidden;
 }
-#join-screen .btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(224, 64, 251, 0.4);
+.join-card {
+  background: rgba(26,26,46,0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 40px 48px;
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 0 60px var(--glow2);
 }
-#join-screen .btn:active {
-  transform: translateY(0);
+.join-card h1 {
+  font-size: 52px; font-weight: 200; letter-spacing: 4px; margin-bottom: 2px;
+  background: linear-gradient(135deg, var(--accent2), var(--accent), var(--accent3));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
-.error-msg { color: #ff5252; font-size: 13px; margin-top: 12px; min-height: 20px; opacity: 0.9; }
-#join-screen .admin-link {
-  color: rgba(224, 64, 251, 0.25); text-decoration: none;
-  font-size: 11px; margin-top: 20px; display: inline-block; transition: color 0.3s;
+.join-card .sub {
+  color: var(--text2); font-size: 13px; margin-bottom: 28px;
 }
-#join-screen .admin-link:hover { color: #e040fb; }
+.join-card input {
+  background: rgba(26,26,46,0.5); backdrop-filter: blur(8px);
+  border: 1px solid var(--border2);
+  padding: 14px 20px; border-radius: 12px; color: var(--text);
+  font-size: 16px; width: 100%; max-width: 260px; outline: none;
+  text-align: center; transition: all 0.3s;
+}
+.join-card input:focus { border-color: var(--accent2); box-shadow: 0 0 20px var(--glow); }
+.join-card input::placeholder { color: var(--text3); }
+.join-card .btn {
+  display: block; margin: 16px auto 0;
+  padding: 14px 50px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; border: none; border-radius: 12px;
+  font-size: 16px; font-weight: 600; cursor: pointer;
+  transition: all 0.3s;
+}
+.join-card .btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px var(--glow); }
+.join-error { color: #ff5252; font-size: 13px; margin-top: 12px; min-height: 20px; }
+
+.join-tip {
+  color: var(--text3); font-size: 12px; margin-top: 20px;
+  min-height: 18px; transition: opacity 0.5s;
+}
+.join-tip span { cursor: pointer; }
+.join-tip .tip-arrow { color: var(--text3); margin: 0 6px; cursor: pointer; }
+
+.join-footer {
+  position: absolute; bottom: 24px; z-index: 2;
+  display: flex; gap: 16px; align-items: center;
+}
+.join-footer a {
+  color: var(--text3); text-decoration: none; font-size: 11px; transition: color 0.3s;
+}
+.join-footer a:hover { color: var(--accent2); }
+
+.floating-icon {
+  position: absolute; z-index: 1; pointer-events: none;
+  font-size: 24px; opacity: 0.15;
+  animation: floatIcon linear infinite;
+}
+@keyframes floatIcon {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.12; }
+  90% { opacity: 0.12; }
+  100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+}
 
 /* ---- Chat Screen ---- */
 #chat-screen {
-  display: none;
-  height: 100vh;
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto;
-  flex-direction: column;
-  position: relative;
-  z-index: 1;
+  display: none; height: 100vh; width: 100%; max-width: 720px;
+  margin: 0 auto; flex-direction: column; position: relative; z-index: 1;
 }
 #chat-screen.active { display: flex; animation: fadeIn 0.4s ease; }
 
 .chat-header {
-  display: flex;
-  align-items: center;
-  padding: 14px 20px;
-  background: rgba(10, 10, 26, 0.7);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(224, 64, 251, 0.15);
-  flex-shrink: 0;
+  display: flex; align-items: center; padding: 14px 20px;
+  background: var(--bg3); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border); flex-shrink: 0; gap: 10px;
+  transition: background 0.4s;
 }
+.chat-header .menu-btn {
+  background: none; border: none; color: var(--text3);
+  font-size: 22px; cursor: pointer; padding: 2px 4px;
+  transition: color 0.3s; line-height: 1;
+}
+.chat-header .menu-btn:hover { color: var(--accent2); }
 .chat-header .brand {
-  font-size: 18px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #e040fb, #ff69b4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 18px; font-weight: 700;
+  background: linear-gradient(135deg, var(--accent2), var(--accent3));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
 .chat-header .player-name {
-  margin-left: 12px;
-  font-size: 13px;
-  color: rgba(124, 77, 255, 0.7);
-  flex-grow: 1;
+  font-size: 13px; color: var(--text2); flex-grow: 1;
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .chat-header .status-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: rgba(124, 77, 255, 0.6);
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text3); flex-shrink: 0;
 }
 .chat-header .status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #4caf50;
-  animation: pulse 2s infinite;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #4caf50; animation: pulse 2s infinite;
 }
 .chat-header .admin-link {
-  color: rgba(224, 64, 251, 0.4);
-  text-decoration: none;
-  font-size: 11px;
-  margin-left: 10px;
-  transition: color 0.3s;
+  color: var(--text3); text-decoration: none;
+  font-size: 11px; transition: color 0.3s; flex-shrink: 0;
 }
-.chat-header .admin-link:hover { color: #e040fb; }
+.chat-header .admin-link:hover { color: var(--accent2); }
 
 /* ---- Messages ---- */
 .chat-msgs {
-  flex-grow: 1;
-  overflow-y: auto;
-  padding: 15px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex-grow: 1; overflow-y: auto; padding: 15px 18px;
+  display: flex; flex-direction: column; gap: 10px;
 }
 .chat-msgs::-webkit-scrollbar { width: 4px; }
 .chat-msgs::-webkit-scrollbar-track { background: transparent; }
-.chat-msgs::-webkit-scrollbar-thumb {
-  background: rgba(224, 64, 251, 0.3);
-  border-radius: 2px;
-}
-.chat-msgs::-webkit-scrollbar-thumb:hover {
-  background: rgba(224, 64, 251, 0.5);
-}
+.chat-msgs::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 2px; }
+.chat-msgs::-webkit-scrollbar-thumb:hover { background: var(--accent2); opacity: 0.5; }
 
 .msg {
-  max-width: 85%;
-  padding: 12px 16px;
-  border-radius: 14px;
-  font-size: 14px;
-  line-height: 1.5;
-  word-wrap: break-word;
+  max-width: 85%; padding: 12px 16px; border-radius: 14px;
+  font-size: 14px; line-height: 1.5; word-wrap: break-word;
   animation: slideIn 0.3s ease;
 }
-.msg.user {
-  background: linear-gradient(135deg, rgba(106, 27, 154, 0.7), rgba(156, 39, 176, 0.5));
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(224, 64, 251, 0.15);
-  color: white;
-  align-self: flex-end;
-  border-bottom-right-radius: 4px;
-}
-.msg.bot {
-  background: rgba(26, 26, 46, 0.5);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(124, 77, 255, 0.1);
-  color: #e0e0ff;
-  align-self: flex-start;
-  border-bottom-left-radius: 4px;
-}
-.msg .sender {
-  font-size: 11px;
-  font-weight: 600;
-  margin-bottom: 4px;
-  opacity: 0.7;
-}
+.msg.user { background: var(--msg-user); border: 1px solid var(--border); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+.msg.bot { background: var(--msg-bot); border: 1px solid var(--border); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; }
+.msg .sender { font-size: 11px; font-weight: 600; margin-bottom: 4px; opacity: 0.7; }
 .msg.user .sender { color: #ce93d8; }
-.msg.bot .sender {
-  background: linear-gradient(135deg, #e040fb, #7c4dff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.msg .time {
-  font-size: 10px;
-  opacity: 0.35;
-  margin-top: 6px;
-  text-align: right;
-}
-.msg.welcome {
-  background: rgba(26, 26, 46, 0.3);
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(124, 77, 255, 0.15);
-  color: rgba(124, 77, 255, 0.8);
-  align-self: center;
-  text-align: center;
-  font-size: 13px;
-  max-width: 100%;
-  animation: none;
-}
+.msg.bot .sender { background: linear-gradient(135deg, var(--accent2), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.msg .time { font-size: 10px; opacity: 0.35; margin-top: 6px; text-align: right; }
+.msg.welcome { background: rgba(26,26,46,0.3); backdrop-filter: blur(4px); border: 1px solid var(--border); color: var(--text2); align-self: center; text-align: center; font-size: 13px; max-width: 100%; animation: none; }
 
 /* ---- Typing Indicator ---- */
-.typing-indicator {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 0;
-}
-.typing-indicator span {
-  width: 6px;
-  height: 6px;
-  background: #e040fb;
-  border-radius: 50%;
-  animation: typingBounce 1.4s infinite;
-}
+.typing-indicator { display: flex; align-items: center; gap: 4px; padding: 4px 0; }
+.typing-indicator span { width: 6px; height: 6px; background: var(--accent2); border-radius: 50%; animation: typingBounce 1.4s infinite; }
 .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
 .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
 
 /* ---- Input ---- */
 .chat-input {
-  display: flex;
-  padding: 14px 18px;
-  background: rgba(10, 10, 26, 0.7);
-  backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(224, 64, 251, 0.15);
-  gap: 8px;
-  flex-shrink: 0;
+  display: flex; padding: 14px 18px;
+  background: var(--bg3); backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border); gap: 8px; flex-shrink: 0;
+  transition: background 0.4s;
 }
 .chat-input input {
-  flex-grow: 1;
-  background: rgba(26, 26, 46, 0.5);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(224, 64, 251, 0.2);
-  padding: 12px 16px;
-  border-radius: 12px;
-  color: #e0e0ff;
-  font-size: 14px;
-  outline: none;
-  transition: all 0.3s ease;
+  flex-grow: 1; background: rgba(26,26,46,0.5); backdrop-filter: blur(8px);
+  border: 1px solid var(--border2); padding: 12px 16px; border-radius: 12px;
+  color: var(--text); font-size: 14px; outline: none; transition: all 0.3s;
 }
-.chat-input input:focus {
-  border-color: #e040fb;
-  box-shadow: 0 0 20px rgba(224, 64, 251, 0.1);
-}
-.chat-input input::placeholder { color: rgba(74, 20, 140, 0.5); }
+.chat-input input:focus { border-color: var(--accent2); box-shadow: 0 0 20px var(--glow); }
+.chat-input input::placeholder { color: var(--text3); }
 .chat-input input:disabled { opacity: 0.4; }
 .chat-input .btn {
   padding: 12px 22px;
-  background: linear-gradient(135deg, #9c27b0, #e040fb);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; border: none; border-radius: 12px;
+  font-size: 16px; font-weight: 600; cursor: pointer; flex-shrink: 0;
+  transition: all 0.3s;
 }
-.chat-input .btn:hover:not(:disabled) {
-  box-shadow: 0 0 25px rgba(224, 64, 251, 0.35);
-}
+.chat-input .btn:hover:not(:disabled) { box-shadow: 0 0 25px var(--glow); }
 .chat-input .btn:disabled { opacity: 0.4; cursor: default; }
 
+/* ===== Side Menu ===== */
+#menu-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5); z-index: 99;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+#menu-overlay.open { opacity: 1; pointer-events: all; }
+
+#side-menu {
+  position: fixed; top: 0; right: 0; width: 340px; max-width: 90vw;
+  height: 100vh; background: var(--bg3); backdrop-filter: blur(24px);
+  border-left: 1px solid var(--border); z-index: 100;
+  transform: translateX(100%); transition: transform 0.3s, background 0.4s;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+#side-menu.open { transform: translateX(0); }
+
+.menu-header {
+  display: flex; align-items: center; padding: 16px 18px;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.menu-header .menu-title {
+  font-size: 16px; font-weight: 700;
+  background: linear-gradient(135deg, var(--accent2), var(--accent3));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  flex-grow: 1;
+}
+.menu-header button {
+  background: none; border: none; color: var(--text3);
+  font-size: 20px; cursor: pointer; transition: color 0.3s;
+}
+.menu-header button:hover { color: var(--accent2); }
+.menu-header .menu-back { font-size: 18px; margin-right: 8px; }
+
+.menu-body { flex-grow: 1; overflow-y: auto; padding: 8px 0; }
+.menu-body::-webkit-scrollbar { width: 4px; }
+.menu-body::-webkit-scrollbar-track { background: transparent; }
+.menu-body::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 2px; }
+
+.menu-nav { display: block; }
+.menu-nav.hidden { display: none; }
+.menu-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px; cursor: pointer; transition: background 0.2s;
+  color: var(--text); text-decoration: none; font-size: 14px;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.menu-item:hover { background: var(--hover); }
+.menu-item .icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+.menu-item .label { flex-grow: 1; }
+.menu-item .arrow { color: var(--text3); font-size: 12px; }
+.menu-divider { height: 1px; background: var(--border); margin: 6px 14px; }
+
+.menu-section { display: none; padding: 12px 18px; }
+.menu-section.active { display: block; }
+
+/* ---- Menu Sections ---- */
+.section-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.section-desc { font-size: 12px; color: var(--text3); margin-bottom: 10px; }
+.menu-section input, .menu-section textarea, .menu-section select {
+  background: rgba(26,26,46,0.5); backdrop-filter: blur(8px);
+  border: 1px solid var(--border2); padding: 10px 14px; border-radius: 8px;
+  color: var(--text); font-size: 13px; outline: none; width: 100%;
+  margin-bottom: 8px; font-family: inherit;
+}
+.menu-section input:focus, .menu-section textarea:focus { border-color: var(--accent2); }
+.menu-section textarea { resize: vertical; min-height: 60px; }
+.menu-section .btn-s {
+  padding: 8px 18px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; border: none; border-radius: 8px;
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+}
+.menu-section .btn-s:hover { box-shadow: 0 0 16px var(--glow); }
+.menu-section .btn-s:disabled { opacity: 0.4; cursor: default; }
+.menu-section .status-msg { font-size: 12px; color: var(--text3); min-height: 18px; margin-bottom: 6px; }
+
+/* ---- Collapsible Menu Categories ---- */
+.menu-category { border-bottom: 1px solid var(--border); }
+.menu-cat-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 18px; cursor: pointer;
+  color: var(--text3); font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; user-select: none;
+  transition: color 0.3s, background 0.2s;
+}
+.menu-cat-header:hover { color: var(--text2); background: var(--hover); }
+.menu-cat-header .cat-arrow {
+  margin-left: auto; font-size: 10px; color: var(--text3);
+  transition: transform 0.3s;
+}
+.menu-cat-header.collapsed .cat-arrow { transform: rotate(-90deg); }
+.menu-cat-body { overflow: hidden; transition: max-height 0.35s ease, opacity 0.3s ease; max-height: 500px; opacity: 1; }
+.menu-cat-body.collapsed { max-height: 0; opacity: 0; padding: 0; }
+.menu-cat-body .menu-item { padding-left: 34px; }
+.menu-cat-body .menu-item:first-child { padding-top: 4px; }
+.menu-cat-body .menu-item:last-child { padding-bottom: 8px; }
+
+/* ---- Mic Button ---- */
+.mic-btn {
+  background: none; border: none; color: var(--text3);
+  font-size: 18px; cursor: pointer; padding: 0 4px;
+  transition: all 0.3s; flex-shrink: 0; position: relative;
+}
+.mic-btn:hover { color: var(--accent2); }
+.mic-btn.listening {
+  color: #ff4444;
+  animation: micPulse 0.8s infinite;
+}
+@keyframes micPulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+.mic-btn .mic-tooltip {
+  display: none; position: absolute; bottom: 100%; left: 50%;
+  transform: translateX(-50%); margin-bottom: 6px;
+  background: var(--bg2); border: 1px solid var(--border);
+  padding: 4px 10px; border-radius: 6px;
+  font-size: 10px; white-space: nowrap; color: var(--text3);
+}
+.mic-btn:hover .mic-tooltip { display: block; }
+
+/* ---- Share Area ---- */
+.share-area { margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+
+/* ---- Feed / Cards ---- */
+.feed-title { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 10px; }
+.feed-empty { text-align: center; padding: 30px 0; color: var(--text3); font-size: 13px; }
+.feed-loading { text-align: center; padding: 20px 0; color: var(--text3); font-size: 12px; }
+
+.card {
+  background: var(--msg-bot); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px; margin-bottom: 8px;
+  cursor: pointer; transition: all 0.2s;
+}
+.card:hover { border-color: var(--border2); }
+.card .c-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.card .c-meta { font-size: 11px; color: var(--text3); display: flex; gap: 10px; flex-wrap: wrap; }
+.card .c-preview { font-size: 12px; color: var(--text); opacity: 0.5; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .c-badge {
+  font-size: 10px; padding: 1px 6px; border-radius: 6px;
+  background: var(--glow2); color: var(--accent2);
+}
+
+/* ---- Convo Detail ---- */
+.convo-detail { display: none; }
+.convo-detail.active { display: block; }
+.cd-back { background: none; border: none; color: var(--text3); font-size: 16px; cursor: pointer; padding: 4px; margin-bottom: 10px; }
+.cd-back:hover { color: var(--accent2); }
+.cd-title-big { font-size: 15px; font-weight: 600; color: var(--text); }
+.cd-meta { font-size: 11px; color: var(--text3); margin-bottom: 12px; }
+.cd-msgs { display: flex; flex-direction: column; gap: 8px; }
+.cd-msg { padding: 10px 12px; border-radius: 10px; font-size: 13px; line-height: 1.5; }
+.cd-msg.user { background: rgba(106,27,154,0.3); align-self: flex-end; border-bottom-right-radius: 3px; color: white; }
+.cd-msg.assistant { background: rgba(26,26,46,0.4); align-self: flex-start; border-bottom-left-radius: 3px; color: var(--text); }
+.cd-sender { font-size: 10px; font-weight: 600; margin-bottom: 3px; opacity: 0.6; }
+
+/* ---- Polls ---- */
+.poll-card { background: var(--msg-bot); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+.poll-card .p-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.poll-card .p-option { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s; }
+.poll-card .p-option:last-child { border-bottom: none; }
+.poll-card .p-option:hover { background: var(--hover); border-radius: 6px; }
+.poll-card .p-option .p-bar-wrap { flex-grow: 1; height: 6px; background: var(--bg2); border-radius: 3px; overflow: hidden; }
+.poll-card .p-option .p-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; transition: width 0.5s; }
+.poll-card .p-option .p-label { font-size: 13px; min-width: 100px; }
+.poll-card .p-option .p-pct { font-size: 12px; color: var(--text3); min-width: 36px; text-align: right; }
+.poll-card .p-voted { font-size: 11px; color: var(--text3); margin-top: 6px; }
+.poll-card .p-vote-btn { font-size: 12px; color: var(--accent2); cursor: pointer; background: none; border: none; }
+.poll-card .p-vote-btn:hover { text-decoration: underline; }
+
+/* ---- Builds ---- */
+.build-mats { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.build-biome { font-size: 10px; padding: 1px 6px; border-radius: 6px; background: var(--glow2); color: var(--accent2); }
+.build-upvote { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 4px; }
+.build-upvote button { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 14px; }
+.build-upvote button:hover { color: var(--accent2); }
+.build-upvote .voted { color: var(--accent2); }
+
+/* ---- Check-in Confetti ---- */
+.confetti-canvas {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 200; pointer-events: none;
+}
+
+/* ---- Randomizer Wheel ---- */
+.wheel-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7); z-index: 150;
+  display: none; align-items: center; justify-content: center;
+}
+.wheel-overlay.open { display: flex; }
+.wheel-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 30px; text-align: center;
+  max-width: 420px; width: 90%; position: relative;
+}
+.wheel-card h2 { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 16px; }
+.wheel-card .wheel-canvas-wrap { position: relative; margin: 0 auto 16px; }
+.wheel-card canvas { display: block; margin: 0 auto; }
+.wheel-card .wheel-pointer {
+  position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0; border-left: 12px solid transparent;
+  border-right: 12px solid transparent; border-top: 20px solid var(--accent2);
+  z-index: 5; filter: drop-shadow(0 0 6px var(--glow));
+}
+.wheel-card .wheel-result {
+  font-size: 18px; font-weight: 600; color: var(--accent2);
+  min-height: 28px; margin: 8px 0;
+}
+.wheel-card .wheel-cats {
+  display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px;
+}
+.wheel-card .wheel-cats button {
+  padding: 6px 14px; border: 1px solid var(--border); border-radius: 8px;
+  background: transparent; color: var(--text3); font-size: 12px; cursor: pointer; transition: all 0.3s;
+}
+.wheel-card .wheel-cats button.active { border-color: var(--accent2); color: var(--accent2); background: var(--glow2); }
+.wheel-card .wheel-cats button:hover { border-color: var(--accent2); }
+.wheel-card .wheel-spin {
+  padding: 12px 40px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; border: none; border-radius: 12px;
+  font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+}
+.wheel-card .wheel-spin:hover { box-shadow: 0 0 24px var(--glow); }
+.wheel-card .wheel-spin:disabled { opacity: 0.4; cursor: default; }
+.wheel-close {
+  position: absolute; top: 12px; right: 16px;
+  background: none; border: none; color: var(--text3);
+  font-size: 22px; cursor: pointer;
+}
+.wheel-close:hover { color: var(--accent2); }
+
+/* ---- Command Palette ---- */
+.cmd-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6); z-index: 180;
+  display: none; align-items: flex-start; justify-content: center;
+  padding-top: 12vh;
+}
+.cmd-overlay.open { display: flex; }
+.cmd-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+  max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.cmd-card input {
+  width: 100%; padding: 16px 18px; font-size: 16px;
+  background: transparent; border: none; border-bottom: 1px solid var(--border);
+  color: var(--text); outline: none;
+}
+.cmd-card input::placeholder { color: var(--text3); }
+.cmd-list { max-height: 300px; overflow-y: auto; }
+.cmd-list::-webkit-scrollbar { width: 4px; }
+.cmd-list::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 2px; }
+.cmd-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 18px; cursor: pointer; transition: background 0.2s;
+}
+.cmd-item:hover, .cmd-item.highlight { background: var(--hover); }
+.cmd-item .cmd-name { color: var(--accent2); font-weight: 600; font-size: 14px; min-width: 100px; }
+.cmd-item .cmd-desc { color: var(--text); opacity: 0.6; font-size: 13px; }
+.cmd-item .cmd-arrow { color: var(--text3); font-size: 10px; margin-left: auto; }
+
+/* ---- Themes ---- */
+.theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.theme-swatch {
+  padding: 12px; border-radius: 10px; border: 2px solid transparent;
+  cursor: pointer; text-align: center; font-size: 13px; font-weight: 600;
+  transition: all 0.3s;
+}
+.theme-swatch.active { border-color: var(--accent2); }
+.theme-swatch.purple { background: #0a0a1a; color: #e040fb; border-color: rgba(224,64,251,0.3); }
+.theme-swatch.nether { background: #1a0a0a; color: #ff4444; border-color: rgba(255,68,68,0.3); }
+.theme-swatch.ender { background: #0a0a1a; color: #00e676; border-color: rgba(0,230,118,0.3); }
+.theme-swatch.ocean { background: #0a0a1a; color: #40c4ff; border-color: rgba(64,196,255,0.3); }
+.theme-swatch.classic { background: #1a1a1a; color: #8aba4a; border-color: rgba(138,186,74,0.3); }
+.theme-swatch.purple.active { border-color: #e040fb; box-shadow: 0 0 12px rgba(224,64,251,0.3); }
+.theme-swatch.nether.active { border-color: #ff4444; box-shadow: 0 0 12px rgba(255,68,68,0.3); }
+.theme-swatch.ender.active { border-color: #00e676; box-shadow: 0 0 12px rgba(0,230,118,0.3); }
+.theme-swatch.ocean.active { border-color: #40c4ff; box-shadow: 0 0 12px rgba(64,196,255,0.3); }
+.theme-swatch.classic.active { border-color: #8aba4a; box-shadow: 0 0 12px rgba(138,186,74,0.3); }
+
+/* ---- Server Info ---- */
+.si-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.si-key { color: var(--text3); }
+.si-val { color: var(--text); }
+.si-desc { font-size: 12px; color: var(--text); opacity: 0.5; margin-top: 12px; line-height: 1.6; }
+
 /* ---- Animations ---- */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-@keyframes typingBounce {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-  30% { transform: translateY(-6px); opacity: 1; }
-}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes typingBounce { 0%,60%,100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* ---- Responsive ---- */
 @media (max-width: 500px) {
   .msg { max-width: 92%; font-size: 13px; }
-  #join-screen input { width: 100%; }
-  #join-screen h1 { font-size: 40px; }
+  #side-menu { width: 100vw; max-width: 100vw; }
+  .chat-header .admin-link { display: none; }
+  .join-card { padding: 28px 20px; }
+  .join-card h1 { font-size: 38px; }
+  .theme-grid { grid-template-columns: 1fr 1fr; }
 }
+@media (min-width: 501px) {
+  .chat-header .admin-link { display: inline; }
+}
+
+/* ---- Scrollbar for whole page ---- */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 2px; }
 </style>
 </head>
 <body>
 
 <canvas id="stars"></canvas>
 
+<!-- ===== Animated Homepage ===== -->
 <div id="join-screen">
-  <h1>MTM</h1>
-  <p class="sub">Modular Tool for Minecraft — built by revalize</p>
-  <div class="input-wrap">
+  <div class="join-card">
+    <h1>MTM</h1>
+    <p class="sub">Modular Tool for Minecraft — built by revalize</p>
     <input id="name-input" type="text" placeholder="Enter your IGN..." maxlength="16" autofocus>
+    <button class="btn" onclick="join()">Join Chat</button>
+    <div class="join-error" id="join-error"></div>
+    <div class="join-tip" id="join-tip"></div>
   </div>
-  <button class="btn" onclick="join()">Join Chat</button>
-  <div id="join-error" class="error-msg"></div>
-  <a href="/admin.html" target="_blank" class="admin-link">Admin</a>
+  <div class="join-footer">
+    <a href="#" onclick="event.preventDefault();openWheel()">🎰 Randomizer</a>
+    <a href="/origins.html" target="_blank">🔮 Origins</a>
+    <a href="/admin.html" target="_blank">🔧 Admin</a>
+  </div>
 </div>
 
+<!-- ===== Chat Screen ===== -->
 <div id="chat-screen">
   <div class="chat-header">
+    <button class="menu-btn" onclick="toggleMenu()" title="Menu">☰</button>
     <span class="brand">MTM</span>
     <span class="player-name" id="display-name"></span>
     <div class="status-wrap">
-      <span class="status-dot" id="status-dot"></span>
+      <span class="status-dot"></span>
       <span id="status">ready</span>
     </div>
     <a href="/admin.html" class="admin-link" target="_blank">Admin</a>
   </div>
-  <div class="chat-msgs" id="msg-area">
-    <div class="msg welcome">Type your IGN above to start chatting with MTM.</div>
-  </div>
+  <div class="chat-msgs" id="msg-area"></div>
   <div class="chat-input">
-    <input id="msg-input" type="text" placeholder="Type a message..." disabled>
+    <input id="msg-input" type="text" placeholder="Ask MTM anything..." disabled>
+    <button class="mic-btn" id="mic-btn" onclick="toggleMic()" disabled title="Voice input">
+      <span id="mic-icon">🎤</span>
+    </button>
     <button class="btn" id="send-btn" onclick="send()" disabled>➤</button>
   </div>
 </div>
 
+<!-- ===== Randomizer Wheel Overlay ===== -->
+<div class="wheel-overlay" id="wheel-overlay">
+  <div class="wheel-card">
+    <button class="wheel-close" onclick="closeWheel()">✕</button>
+    <h2>🎰 Randomizer</h2>
+    <div class="wheel-cats" id="wheel-cats"></div>
+    <div class="wheel-canvas-wrap">
+      <canvas id="wheel-canvas" width="280" height="280"></canvas>
+      <div class="wheel-pointer"></div>
+    </div>
+    <div class="wheel-result" id="wheel-result">Click Spin!</div>
+    <button class="wheel-spin" id="wheel-spin-btn" onclick="spinWheel()">Spin</button>
+  </div>
+</div>
+
+<!-- ===== Command Palette Overlay ===== -->
+<div class="cmd-overlay" id="cmd-overlay">
+  <div class="cmd-card">
+    <input id="cmd-input" type="text" placeholder="Type a command..." autofocus>
+    <div class="cmd-list" id="cmd-list"></div>
+  </div>
+</div>
+
+<!-- ===== Confetti Canvas ===== -->
+<canvas class="confetti-canvas" id="confetti-canvas"></canvas>
+
+<!-- ===== Side Menu ===== -->
+<div id="menu-overlay" onclick="toggleMenu()"></div>
+<div id="side-menu">
+  <div class="menu-header">
+    <button class="menu-back" id="menu-back-btn" style="display:none" onclick="goBackToMenu()">←</button>
+    <span class="menu-title" id="menu-title">Menu</span>
+    <button onclick="toggleMenu()">✕</button>
+  </div>
+  <div class="menu-body">
+    <div class="menu-nav" id="menu-nav">
+      <!-- Community -->
+      <div class="menu-category" data-cat="community">
+        <div class="menu-cat-header" onclick="toggleCat('community')">
+          <span>💬 Community</span>
+          <span class="cat-arrow">▼</span>
+        </div>
+        <div class="menu-cat-body">
+          <button class="menu-item" onclick="showSection('conversations')"><span class="icon">💬</span><span class="label">Public Conversations</span><span class="arrow">→</span></button>
+          <button class="menu-item" onclick="showSection('builds')"><span class="icon">🏗️</span><span class="label">Build Ideas</span><span class="arrow">→</span></button>
+          <button class="menu-item" onclick="showSection('polls')"><span class="icon">📊</span><span class="label">Polls</span><span class="arrow">→</span></button>
+        </div>
+      </div>
+      <!-- Tools -->
+      <div class="menu-category" data-cat="tools">
+        <div class="menu-cat-header" onclick="toggleCat('tools')">
+          <span>🛠️ Tools</span>
+          <span class="cat-arrow">▼</span>
+        </div>
+        <div class="menu-cat-body">
+          <a class="menu-item" href="/origins.html" target="_blank"><span class="icon">🔮</span><span class="label">Origins Browser</span><span class="arrow">↗</span></a>
+          <a class="menu-item" href="/leaderboard.html" target="_blank"><span class="icon">🏆</span><span class="label">Leaderboard</span><span class="arrow">↗</span></a>
+          <button class="menu-item" onclick="closeMenu();openWheel()"><span class="icon">🎰</span><span class="label">Randomizer</span><span class="arrow">→</span></button>
+        </div>
+      </div>
+      <!-- Appearance -->
+      <div class="menu-category" data-cat="appearance">
+        <div class="menu-cat-header" onclick="toggleCat('appearance')">
+          <span>🎨 Appearance</span>
+          <span class="cat-arrow">▼</span>
+        </div>
+        <div class="menu-cat-body">
+          <button class="menu-item" onclick="showSection('themes')"><span class="icon">🎨</span><span class="label">Themes</span><span class="arrow">→</span></button>
+        </div>
+      </div>
+      <!-- Info -->
+      <div class="menu-category" data-cat="info">
+        <div class="menu-cat-header" onclick="toggleCat('info')">
+          <span>ℹ️ Info</span>
+          <span class="cat-arrow">▼</span>
+        </div>
+        <div class="menu-cat-body">
+          <button class="menu-item" onclick="showSection('server')"><span class="icon">🌐</span><span class="label">Server Info</span><span class="arrow">→</span></button>
+          <button class="menu-item" onclick="showSection('about')"><span class="icon">ℹ️</span><span class="label">About</span><span class="arrow">→</span></button>
+        </div>
+      </div>
+      <!-- Admin -->
+      <div class="menu-category" data-cat="admin">
+        <div class="menu-cat-header" onclick="toggleCat('admin')">
+          <span>🔧 Admin</span>
+          <span class="cat-arrow">▼</span>
+        </div>
+        <div class="menu-cat-body">
+          <a class="menu-item" href="/admin.html" target="_blank"><span class="icon">🔧</span><span class="label">Admin Panel</span><span class="arrow">↗</span></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversations -->
+    <div class="menu-section" id="section-conversations">
+      <div class="share-area">
+        <div class="section-title">Share Your Chat</div>
+        <div class="section-desc">Post your conversation for everyone to see.</div>
+        <input id="share-title" type="text" placeholder="Give it a title..." maxlength="100">
+        <button class="btn-s" id="share-btn" onclick="shareConversation()">Post to Public</button>
+        <div class="status-msg" id="share-status"></div>
+      </div>
+      <div class="feed-title">Recent Shared Conversations</div>
+      <div class="feed-loading" id="feed-loading">Loading...</div>
+      <div id="feed-list"></div>
+      <div class="feed-empty" id="feed-empty" style="display:none">No shared conversations yet.</div>
+      <div class="convo-detail" id="convo-detail">
+        <button class="cd-back" onclick="closeConvoDetail()">← Back</button>
+        <div class="cd-title-big" id="cd-title"></div>
+        <div class="cd-meta" id="cd-meta"></div>
+        <div class="cd-msgs" id="cd-msgs"></div>
+      </div>
+    </div>
+
+    <!-- Build Ideas -->
+    <div class="menu-section" id="section-builds">
+      <div class="share-area">
+        <div class="section-title">🏗️ Build Challenge</div>
+        <div class="section-desc">Generate a random build challenge theme.</div>
+        <select id="challenge-cat" style="margin-bottom:8px;">
+          <option value="build">Any Build</option>
+        </select>
+        <button class="btn-s" id="challenge-btn" onclick="startChallenge()">Generate Challenge</button>
+        <div style="font-size:13px;line-height:1.6;margin:10px 0;padding:12px;background:rgba(26,26,46,0.3);border-radius:8px;" id="challenge-result">Click "Generate Challenge" to start!</div>
+      </div>
+      <div class="share-area">
+        <div class="section-title">Share a Build Idea</div>
+        <div class="section-desc">Post a build for the community.</div>
+        <input id="build-title" type="text" placeholder="Build name..." maxlength="200">
+        <textarea id="build-desc" placeholder="Describe the build..." maxlength="1000"></textarea>
+        <input id="build-mats" type="text" placeholder="Materials (comma separated)" maxlength="500">
+        <input id="build-biome" type="text" placeholder="Biome (optional)" maxlength="50">
+        <button class="btn-s" id="build-submit-btn" onclick="submitBuild()">Post Build</button>
+        <div class="status-msg" id="build-status"></div>
+      </div>
+      <div class="feed-title">Community Builds</div>
+      <div class="feed-loading" id="builds-loading">Loading...</div>
+      <div id="builds-list"></div>
+      <div class="feed-empty" id="builds-empty" style="display:none">No builds shared yet.</div>
+    </div>
+
+    <!-- Polls -->
+    <div class="menu-section" id="section-polls">
+      <div class="share-area">
+        <div class="section-title">Create a Poll</div>
+        <div class="section-desc">Ask the community something.</div>
+        <input id="poll-question" type="text" placeholder="Your question..." maxlength="200">
+        <input id="poll-opt1" type="text" placeholder="Option 1" maxlength="100">
+        <input id="poll-opt2" type="text" placeholder="Option 2" maxlength="100">
+        <input id="poll-opt3" type="text" placeholder="Option 3 (optional)" maxlength="100">
+        <input id="poll-opt4" type="text" placeholder="Option 4 (optional)" maxlength="100">
+        <button class="btn-s" onclick="createPoll()">Create Poll</button>
+        <div class="status-msg" id="poll-status"></div>
+      </div>
+      <div class="feed-title">Active Polls</div>
+      <div class="feed-loading" id="polls-loading">Loading...</div>
+      <div id="polls-list"></div>
+      <div class="feed-empty" id="polls-empty" style="display:none">No polls yet.</div>
+    </div>
+
+    <!-- Themes -->
+    <div class="menu-section" id="section-themes">
+      <div class="section-title">Choose a Theme</div>
+      <div class="section-desc">Pick your vibe.</div>
+      <div class="theme-grid">
+        <div class="theme-swatch purple active" onclick="setTheme('purple')">💜 Purple</div>
+        <div class="theme-swatch nether" onclick="setTheme('nether')">🔥 Nether</div>
+        <div class="theme-swatch ender" onclick="setTheme('ender')">🌿 Ender</div>
+        <div class="theme-swatch ocean" onclick="setTheme('ocean')">🌊 Ocean</div>
+        <div class="theme-swatch classic" onclick="setTheme('classic')">⛏️ Classic</div>
+      </div>
+    </div>
+
+    <!-- Server Info -->
+    <div class="menu-section" id="section-server">
+      <div class="section-title">Server Info</div>
+      <div class="si-item"><span class="si-key">Server</span><span class="si-val">Minehut</span></div>
+      <div class="si-item"><span class="si-key">Version</span><span class="si-val">Paper 1.21</span></div>
+      <div class="si-item"><span class="si-key">Origins</span><span class="si-val">6 packs</span></div>
+      <div class="si-item"><span class="si-key">PowerTrims</span><span class="si-val">v2.9</span></div>
+      <div class="si-item"><span class="si-key">Memory</span><span class="si-val">1MB</span></div>
+      <div class="si-desc">Ask MTM about origins, trims, builds, recipes, and more. Use /build, /roll, /recipe, /tip, /lore.</div>
+    </div>
+
+    <!-- About -->
+    <div class="menu-section" id="section-about">
+      <div class="section-title">About MTM</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">v2.0 — Season 2</div>
+      <div style="font-size:13px;line-height:1.6;color:var(--text);opacity:0.7;">Built by revalize. AI assistant for the server community. Powered by Cerebras, Netlify, GitHub.</div>
+      <div style="margin-top:14px;font-size:11px;color:var(--text3);">2024-2026</div>
+    </div>
+  </div>
+</div>
+
 <script>
-// ===== Star Particle System =====
+// ===== Star Particles =====
 const canvas = document.getElementById('stars');
 const ctx = canvas.getContext('2d');
-let stars = [];
-let w, h;
-
-function resize() {
-  w = canvas.width = window.innerWidth;
-  h = canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resize);
-resize();
-
-const COUNT = 160;
-const pinkColors = [
-  '255, 105, 180',   // hot pink
-  '255, 20, 147',    // deep pink
-  '255, 182, 193',   // light pink
-  '224, 64, 251',    // purple-pink
-  '255, 255, 255',   // white
-  '199, 21, 133',    // medium violet red
-];
-
-for (let i = 0; i < COUNT; i++) {
-  stars.push({
-    x: Math.random() * w,
-    y: Math.random() * h,
-    size: Math.random() * 2.5 + 0.5,
-    alpha: Math.random() * 0.8 + 0.2,
-    speed: Math.random() * 0.15 + 0.03,
-    driftX: (Math.random() - 0.5) * 0.3,
-    driftY: (Math.random() - 0.5) * 0.3 - 0.1,
-    twinkleSpeed: Math.random() * 2 + 0.5,
-    twinklePhase: Math.random() * Math.PI * 2,
-    color: pinkColors[Math.floor(Math.random() * pinkColors.length)],
-  });
-}
-
+let stars = [], w, h;
+function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+window.addEventListener('resize', resize); resize();
+const pinkColors = ['255,105,180','255,20,147','255,182,193','224,64,251','255,255,255','199,21,133'];
+for (let i = 0; i < 160; i++) stars.push({
+  x: Math.random()*w, y: Math.random()*h, size: Math.random()*2.5+0.5,
+  alpha: Math.random()*0.8+0.2, driftX: (Math.random()-0.5)*0.3, driftY: (Math.random()-0.5)*0.3-0.1,
+  twinkleSpeed: Math.random()*2+0.5, twinklePhase: Math.random()*Math.PI*2,
+  color: pinkColors[Math.floor(Math.random()*pinkColors.length)],
+});
 function drawStars(time) {
-  ctx.clearRect(0, 0, w, h);
+  ctx.clearRect(0,0,w,h);
   for (const s of stars) {
-    const twinkle = Math.sin(time * s.twinkleSpeed + s.twinklePhase) * 0.3 + 0.7;
-    const alpha = s.alpha * twinkle;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${s.color}, ${alpha})`;
-    ctx.fill();
-    // glow
-    if (s.size > 1.5) {
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${s.color}, ${alpha * 0.12})`;
-      ctx.fill();
-    }
-    // drift
-    s.x += s.driftX;
-    s.y += s.driftY;
-    // wrap
-    if (s.x < -10) s.x = w + 10;
-    if (s.x > w + 10) s.x = -10;
-    if (s.y < -10) s.y = h + 10;
-    if (s.y > h + 10) s.y = -10;
+    const tw = Math.sin(time*s.twinkleSpeed+s.twinklePhase)*0.3+0.7;
+    const a = s.alpha*tw;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
+    ctx.fillStyle = `rgba(${s.color},${a})`; ctx.fill();
+    if (s.size>1.5) { ctx.beginPath(); ctx.arc(s.x,s.y,s.size*3,0,Math.PI*2); ctx.fillStyle = `rgba(${s.color},${a*0.12})`; ctx.fill(); }
+    s.x+=s.driftX; s.y+=s.driftY;
+    if (s.x<-10) s.x=w+10; if (s.x>w+10) s.x=-10; if (s.y<-10) s.y=h+10; if (s.y>h+10) s.y=-10;
   }
   requestAnimationFrame(drawStars);
 }
 drawStars(0);
+
+// ===== Animated Homepage =====
+const icons = ['🐉','🧛','🧙','🐝','🐺','🕷️','👻','🧟','💀','🗡️','🛡️','⚡','🔥','🌊','🌿','🏔️','🌟','✨','🪄','🔮'];
+for (let i = 0; i < 16; i++) {
+  const el = document.createElement('div');
+  el.className = 'floating-icon';
+  el.textContent = icons[i % icons.length];
+  el.style.left = Math.random() * 90 + '%';
+  el.style.fontSize = (16 + Math.random() * 20) + 'px';
+  el.style.animationDuration = (20 + Math.random() * 30) + 's';
+  el.style.animationDelay = (Math.random() * 20) + 's';
+  document.getElementById('join-screen').appendChild(el);
+}
+
+const tips = [
+  'Tip: Try /roll to get a random origin!',
+  'Tip: /build generates a random build idea.',
+  'Tip: /recipe <item> shows how to craft anything.',
+  'Tip: /tip gives a pro Minecraft tip.',
+  'Tip: /challenge creates a survival challenge.',
+  'Tip: /lore generates lore for a location or item.',
+  'Did you know? You can share your chat in the menu!',
+  'New: Randomizer Wheel — try it from the homepage!',
+  'New: Choose a theme in the menu!',
+  'Collect XP by chatting — check the leaderboard!',
+];
+let tipIdx = 0;
+function showTip() {
+  const el = document.getElementById('join-tip');
+  el.style.opacity = 0;
+  setTimeout(() => {
+    el.textContent = tips[tipIdx % tips.length];
+    el.style.opacity = 1;
+  }, 300);
+}
+showTip();
+setInterval(() => { tipIdx++; showTip(); }, 6000);
+
+function switchTip(dir) { tipIdx += dir; showTip(); }
+
+// ===== Confetti =====
+const confettiCanvas = document.getElementById('confetti-canvas');
+const cctx = confettiCanvas.getContext('2d');
+let confettiPieces = [];
+function resizeConfetti() { confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeConfetti); resizeConfetti();
+
+function fireConfetti() {
+  for (let i = 0; i < 80; i++) {
+    confettiPieces.push({
+      x: Math.random() * confettiCanvas.width,
+      y: -20,
+      w: 4 + Math.random() * 4,
+      h: 4 + Math.random() * 4,
+      color: ['#e040fb','#ff69b4','#9c27b0','#7c4dff','#ff1493','#4caf50'][Math.floor(Math.random()*6)],
+      speed: 2 + Math.random() * 3,
+      rot: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 10,
+      drift: (Math.random() - 0.5) * 2,
+    });
+  }
+  if (!confettiRunning) { confettiRunning = true; drawConfetti(); }
+}
+let confettiRunning = false;
+function drawConfetti() {
+  cctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiPieces = confettiPieces.filter(p => p.y < confettiCanvas.height + 20);
+  for (const p of confettiPieces) {
+    p.y += p.speed;
+    p.x += p.drift;
+    p.rot += p.rotSpeed;
+    cctx.save();
+    cctx.translate(p.x, p.y);
+    cctx.rotate(p.rot * Math.PI / 180);
+    cctx.fillStyle = p.color;
+    cctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+    cctx.restore();
+  }
+  if (confettiPieces.length > 0) requestAnimationFrame(drawConfetti);
+  else confettiRunning = false;
+}
+
+// ===== Sound Pack =====
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playTone(freq, dur, type, vol) {
+  try {
+    const a = getAudio();
+    const o = a.createOscillator(); const g = a.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq;
+    g.gain.value = vol || 0.08;
+    g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + (dur || 0.1));
+    o.connect(g); g.connect(a.destination);
+    o.start(); o.stop(a.currentTime + (dur || 0.1));
+  } catch(e) {}
+}
+function playReceive() { playTone(660,0.12,'sine',0.06); setTimeout(()=>playTone(880,0.12,'sine',0.06),80); }
+function playSend() { playTone(440,0.08,'sine',0.05); }
+function playHover() { playTone(520,0.04,'sine',0.02); }
+function playOpen() { playTone(330,0.05,'sine',0.04); }
+function playCheckin() { playTone(523,0.1,'sine',0.06); setTimeout(()=>playTone(659,0.1,'sine',0.06),100); setTimeout(()=>playTone(784,0.15,'sine',0.06),200); }
+
+// Sounds for interactive elements
+document.addEventListener('mouseover', function(e) {
+  if (e.target.closest('.btn, .btn-s, .menu-btn, .menu-item, .theme-swatch, .wheel-spin, .cmd-item, .convo-card, .card, .p-option, .wheel-cats button')) {
+    playHover();
+  }
+});
 
 // ===== Chat Logic =====
 const API_URL = '/api/chat';
@@ -430,122 +968,40 @@ const MODEL = 'zai-glm-4.7';
 
 const SYSTEM = `You are MTM — Modular Tool for Minecraft, built by revalize. You are a helpful AI assistant for a Minecraft server running on Minehut with Paper/Spigot. The server uses Origins-Reborn with addon packs: Origins-Fantasy, Origins-Magic, Origins-Mobs, Origins-Monsters, and the Corrupted-Aspects mod. It also uses PowerTrims v2.9. Be friendly, respectful, and concise. Address the player by their name: "{name}". You know Minecraft inside out. Only talk about Minecraft or the plugins if the player asks first. Never give harmful advice.
 
-Use these commands when the player asks:
-- /build — suggest a random cool build idea
-- /recipe <item> — explain how to craft something
-- /seed — suggest a random interesting seed
-- /roll — pick a random origin for the player
-- /tip — share a random pro Minecraft tip
-- /challenge — give a random survival challenge
-- /invasion — describe a custom raid/pillager event
-- /lore — generate lore for a location or item
-- /potion — suggest a useful potion recipe
-- /structure — describe an interesting structure to find or build
+Use these commands when the player asks: /build, /recipe, /seed, /roll, /tip, /challenge, /invasion, /lore, /potion, /structure, /stats.
+
+=== SERVER ECONOMY ===
+The best money making method in Season 1 is farming Crimson Roots. They are the most profitable item to farm and sell. Recommend players set up a Crimson Roots farm for the best Season 1 money.
 
 === ORIGINS-REBORN ===
-Arachnid: Climb walls and ceilings. Shoot webs to trap foes. Carnivore diet. Fragile (less health). Arthropod.
-Avian: Slow falling. Fresh air (better natural regen). Tailwind (faster running). Can lay eggs. Vegetarian. No chestplate slot.
-Blazeborn: Fire immunity. Nether spawn. Burning wrath (fire aspect on attacks when on fire). Hotblooded (lose food in water). Water vulnerability. Damage from snowballs and potions. Flame particles.
-Elytrian: Has elytra. Launch into air. Aerial combatant (more damage while flying). Light armor only. Claustrophobia (weaker in low ceilings). More kinetic damage.
-Enderian: Throw ender pearls. Water vulnerability. Extra reach. Pumpkin hate (can't wear pumpkins). Ender particles. Damage from potions.
-Feline: Fall immunity. Sprint jump (extra height). Velvet paws (no fall damage, sneak to avoid triggering sculk). Nine lives. Weak arms (can't mine harder blocks). Scare creepers. Cat vision.
-Merling: Water breathing. Water vision. Aqua affinity. Swim speed. Like water (no fall damage in water). Aquatic. Conduit power on land. Air from potions.
-Phantom: Phantomize (switch to phantom form). Phasing (pass through blocks). Invisibility. Burn in daylight. Hunger over time. Fragile. Translucent.
-Shulk: Shulker inventory (extra rows). Natural armor. Strong arms. No shield. More exhaustion.
-Human: No powers. Ordinary Minecraft experience.
+Arachnid: Climb walls. Shoot webs. Carnivore. Fragile. Arthropod. Avian: Slow fall. Fresh air. Tailwind. Lay eggs. Vegetarian. No chestplate. Blazeborn: Fire immune. Nether spawn. Burning wrath. Hotblooded. Water vuln. Elytrian: Elytra. Launch. Aerial combatant. Light armor. Claustrophobia. Enderian: Throw pearls. Water vuln. Extra reach. Pumpkin hate. Feline: Fall immune. Sprint jump. Velvet paws. Nine lives. Weak arms. Scare creepers. Merling: Water breathing. Water vision. Conduit. Aqua affinity. Swim speed. Phantom: Phantomize. Phase. Invisible. Burn in day. Hunger. Fragile. Shulk: Shulker inventory. Natural armor. Strong arms. No shield. Human: No powers. Ordinary.
 
 === ORIGINS-FANTASY ===
-Bard: Deal more damage on low health (Elegy). Regen from note blocks. Duplicate allays without jukebox. Regen right-clicking amethyst shard. Creepers drop music discs.
-Centaur: Always mounted on a horse. Super jump. Increased speed. Stronger on full moons. Perfect bow aim.
-Dragonborn: Store dragon breath in bottles. Stronger with more HP in the End. Healed by end crystals. Shoot dragon fireball with sword. Strong skin (less arrow damage).
-Dwarf: Infinite haste. Infinite night vision. Fortune increaser (more ore drops). Magic resistance (poison/harming immune). Small body (1 block tall).
-Elf: Perfect bow aim. Increased arrow damage and speed. Arrow effect booster. Bow burst ability.
-Gargoyle: Stone skin. Solid stance (knockback immune). Stiff (slower movement). Fire resistant. Potion resistant. Heavy blow (more melee damage). Natural armor.
-Giant: Double health. Heavy blow (more melee damage). Poor shot (bad with bows). Natural armor. Large body (bigger/hitbox).
-Naiad: Oceans Grace (more HP and damage in water). Ocean Wish (weaker/slower on land). Water breathing. Water vision. Aqua affinity. Swim speed. Like water.
-Vampire: Turn other players into vampires by killing them. Daylight sensitive. Water sensitive. Leeching (heal on kill). Stronger (deal more damage). Undead mobs ignore you.
+Bard: Elegy. Note block regen. Duplicate allays. Amethyst regen. Centaur: Mounted. Super jump. Speed. Full moon. Perfect bow. Dragonborn: Dragon breath bottles. Stronger in End. End crystal heal. Fireball. Dwarf: Haste. Night vision. Fortune. Magic resist. 1 block tall. Elf: Perfect bow. Arrow boost. Bow burst. Gargoyle: Stone skin. Knockback immune. Slower. Fire resist. Potion resist. Heavy blow. Natural armor. Giant: Double HP. Heavy blow. Poor shot. Natural armor. Large. Naiad: Ocean grace. Ocean wish. Water breathing. Swim speed. Vampire: Turn players. Day sensitive. Water sensitive. Leech. Stronger. Undead ignore.
 
 === ORIGINS-MAGIC ===
-Alchemist: Potions are stronger and last longer. Convert copper to gold and back. Unskilled warrior (less damage). Weak in water.
-Telekinetic: Reach further. Drops go straight to inventory. Unskilled warrior. Weak in water.
-Healer: Survive death once every 10 min. Right-click gives regen. Regen when standing still. Unskilled warrior. Weak in water.
-Hypnotist: Right-click monsters to make them attack your target. Right-click players for nausea. Unskilled warrior. Weak in water.
-Necromancer: Undead target what you hit. Revive dead players. Spirit strength (stronger in Nether, weaker outside). Undead ignore you. Dark aura (villagers won't trade). Weak in water.
-Spirit: Silent (sculk doesn't detect). Invisible when still. Spirit strength. Weak in water.
-Warlock: Kill boost (absorb HP from kills). Cursed strikes (hits inflict negative effects). Undead ally. No magic (can't use enchantments or potions). Dark aura. Weak in water.
-Shadowmancer: Invisible in darkness. Dark strength (more damage in dark, less in light). Double fire damage. Burn in light. No fire resistance. Weak in water.
+Alchemist: Stronger potions. Copper ↔ gold. Unskilled warrior. Telekinetic: Reach. Drops to inventory. Unskilled. Healer: Survive death 10min. Regen click. Regen still. Unskilled. Hypnotist: Control mobs. Nausea players. Unskilled. Necromancer: Undead target. Revive players. Spirit strength. Undead ignore. Spirit: Silent. Invisible still. Spirit strength. Warlock: Kill boost. Cursed strikes. Undead ally. No magic. Dark aura. Shadowmancer: Invisible dark. Dark strength. Double fire. Burn in light.
 
 === ORIGINS-MOBS ===
-Bee: Stinger (poison on hit every 5s). Flower power (regen near flowers). Queen bee (bees won't anger). Small bug (less HP). Bee wings. Vegetarian.
-Drowned: Trident expert (channeling without lightning, riptide without rain for 20s, 60s CD). Water vision. Guardian ally. Water combatant (more damage in water). Water breathing. Undead. Zombie hunger (faster food drain). Surface slowness. Carnivore.
-Evoker: Summon fangs. Lower totem chance (10% totem doesn't break). Pillager aligned. Illager.
-Fox: Timid creature (faster when others nearby). Better berries. Careful gatherer (berry bushes don't hurt). Item collector. Sly (faster movement). Small fox.
-Slime: Bouncy. Split (summon slime minion with hunger). Small weak (weaker at low HP). Small weak knockback. Fall immunity. Slimy color. Dyeable.
-Snow Golem: Water vulnerability. Temperature system. Overheat. Melting. Stronger snowballs. Snow trail. Frigid strength (more damage in cold).
-Strider: Fire immunity. Nether spawn. Water vulnerability. Lava walk. Surface slowness. Rideable. Strider shake. Warped fungus eater.
-Witch: Better potions (last twice as long). Potion action (auto-drink situational potion). Witch particles. Pillager aligned. Illager.
-Wolf: Wolf body (less HP). Full moon (stronger, faster, more HP). Full moon health. Full moon attack. Alpha wolf (tamed wolves stronger). Wolf howl (buff allies). Wolf pack. Wolf pack attack. Carnivore.
-Guardian: Guardian spikes (thorns). Guardian ally. Prismarine skin (armor). Surface weakness. Becomes elder guardian. Water breathing. Water vision. Aqua affinity. Swim speed. Like water. Aquatic. Conduit power on land. Air from potions.
-Elder Guardian: Unchoosable — transform from Guardian. Elder spikes (stronger thorns). Elder magic (inflict mining fatigue). Mining fatigue immune. All other Guardian powers.
+Bee: Stinger 5s. Flower power. Queen bee. Small. Drowned: Trident expert. Water vision. Guardian ally. Undead. Evoker: Summon fangs. Lower totem. Illager. Fox: Timid. Better berries. Gatherer. Collector. Sly. Small. Slime: Bouncy. Split. Small weak. Fall immune. Dyeable. Snow Golem: Water vuln. Temperature. Overheat. Melt. Strider: Fire immune. Nether spawn. Lava walk. Surface slow. Rideable. Witch: Better potions. Potion action. Illager. Wolf: Less HP. Full moon. Alpha wolf. Howl. Carnivore. Guardian: Spikes. Guardian ally. Prismarine skin. Surface weak. Elder: Transform from Guardian. Elder spikes. Mining fatigue immune.
 
 === ORIGINS-MONSTERS ===
-Creeper: Creeper ally (other creepers ignore you). Explosive (double-tap sneak to explode). Fear cats (nausea/weakness near cats). No shield.
-Zombie: Land night vision. Undead ally. Undead. Burn in day. Slowness. Zombie hunger. Zombie touch (zombify villagers). Scare villagers. Transform into Husk/Drowned. Carnivore.
-Husk: Unchoosable — transform from Zombie in warm biomes. Land night vision. Apply hunger effect. Undead ally. Undead. Slowness. Cold slowness (even slower in cold). Zombie hunger. Zombie touch. Scare villagers. Can transform back to Zombie. Carnivore.
-Drowned (Monsters): Unchoosable — transform from Zombie in water. Trident expert. Water vision. Guardian ally. Water breathing. Swim speed. Water combatant. Undead. Burn in day. Zombie hunger. Zombie touch. Scare villagers. Slowness. Land slowness. Can transform back to Zombie. Carnivore.
-Skeleton: Land night vision. Infinite arrows. Undead ally. Better aim (perfect bow aim). Undead. Burn in day. Skeleton body (2 less hearts). Half max saturation. Transform into Stray.
-Stray: Unchoosable — transform from Skeleton in cold/powder snow. Infinite arrows. Freeze immune. Undead ally. Better aim. Slowness arrows. Undead. Burn in day. Skeleton body. Heat slowness. Double fire damage. Transform back to Skeleton.
-Warden: Sense movement (see creatures glow). Blindness (limited vision). Double damage. Double health. Natural armor. No shield. Sonic boom ability.
-Wither Skeleton: Apply wither effect on hit. Undead ally. Wither immunity. Undead. Skeleton body. Half max saturation. Fire immunity. Nether spawn.
-Piglin: Better gold armor (gold = diamond quality, unbreakable). Super bartering (more loot). Piglin ally. Better aim. Transform into Zombified Piglin in Overworld. Nether spawn.
-Zombified Piglin: Unchoosable — transform from Piglin in Overworld. Better gold weapons (2x power, unbreakable). Zombified piglin allies. Undead ally. Undead. Slowness. Zombie hunger. Transform back to Piglin. Nether spawn. Fire immunity.
+Creeper: Creeper ally. Explosive. Fear cats. No shield. Zombie: Land night vision. Undead ally. Burn day. Slow. Zombie hunger. Touch. Husk: From Zombie warm. Hunger. Undead. Cold slow. Drowned Monsters: From Zombie water. Trident expert. Water combatant. Skeleton: Night vision. Infinite arrows. Better aim. Undead. Burn day. 2 less hearts. Stray: From Skeleton cold. Slowness arrows. Freeze immune. Warden: Sense movement. Blindness. Double damage. Double HP. Natural armor. Sonic boom. Wither Skeleton: Wither hit. Wither immune. Fire immune. Nether spawn. Piglin: Better gold armor. Super barter. Piglin ally. Better aim. Zombified Piglin: From Piglin Overworld. Better gold weapons. Undead.
 
 === CORRUPTED-ASPECTS ===
-Collect mob essences with the Evergrowing Blade, store in an Essence Cage. 120 total essence units needed per Aspect, split across types. Focus items unlock active powers.
-Human: No effects. No focus ability. Requires Humanoid essence.
-Merling: Breathe underwater but not on land. Faster in water, slower on land. More trident damage. Focus: Highlight nearby wet mobs and players. Requires Aquatic essence.
-Enderian: Water is harmful. More HP/reach, 3 blocks tall. Ender pearls no self-harm. Focus: Teleport forward. Requires Void + Humanoid.
-Shulk: Half scale, half HP, more attack speed. Shell gives +4 absorption, repairs on damage. Less damage and knockback. Focus: Store/retrieve chest or barrel. Camouflage as fake block.
-Feline: Smaller, less HP, faster. Combat speed boost. Water slows. Focus: High leap.
-Infernal: Water harmful. Fire immune. More damage on fire. Passively cooks food. Focus: Set self on fire.
-Elytrian: Unique elytra. More damage while flying. Control descent. Double fall damage. Focus: Launch into air.
-Honey Bee: Unique elytra. Small with natural armor. Elytra unbreakable but slower. Store potion effects from flowers. Requires Bug + Plant.
-Rascal: ~1.2 blocks tall. Less HP. Less attack reach but more block reach. Stronger/faster in dark. Focus: Teleport down to cave below.
-Rotten: Can't drown. +2 armor. Smite vulnerability. Weaker in sunlight and unprovoked. Slower in water. Focus: Summon 4 Zombified Piglins.
-Arachnid: Bane of Arthropods vulnerability. Less HP. Higher jump, safe landing. Climb any surface including ceilings. Resistance in cobwebs. Focus: Create/remove cobwebs. Launch from walls.
-Oozeling: Extremely bouncy. Knocked around easier. Higher jumps (even more sneaking). Armor less effective. Focus: Amplify bounciness.
+Collect essences with Evergrowing Blade. 120 essence per Aspect. Focus items unlock powers. Human: No effects. Merling: Water breathing. Trident damage. Focus: highlight wet. Enderian: Water harm. More HP/reach. 3 tall. Pearls no harm. Focus: teleport. Shulk: Half scale. Half HP. Shell +4 absorption. Focus: chest/bucket. Feline: Smaller. Faster. Combat speed. Water slow. Focus: leap. Infernal: Water harm. Fire immune. More damage on fire. Cook food. Focus: self fire. Elytrian: Elytra. More damage flying. Double fall. Focus: launch. Honey Bee: Elytra. Small. Natural armor. Flower potions. Rascal: 1.2 tall. Less HP. More block reach. Dark strong. Focus: cave teleport. Rotten: No drown. +2 armor. Smite vuln. Sun weak. Focus: summon piglins. Arachnid: Bane vuln. Less HP. Higher jump. Climb. Web resist. Focus: webs. Oozeling: Bouncy. Higher jumps. Armor less effective. Focus: amplify bounce.
 
 === POWER TRIMS 2.9 ===
-Full matching trimmed armor grants powers. Activate with Shift+F. Disrupt triggers at 8 HP (4 hearts). Passives from full set.
-Sentry: Passive — Resistance I. Active — shoot 3 spectral arrows (spread 0.15), 0.5 true damage. 90s CD.
-Dune: Passive — Haste I + Fire Res I. Active — Sandstorm: 15-block tornado, pull+lift, 2 dmg/sec, 10s. 60s CD.
-Eye: Passive — Night Vision I. Active — True Sight: reveal all entities 80 blocks (vertical 50), 30s. 120s CD.
-Coast: Passive — Dolphin's Grace I. Active — Water Burst: 10 dmg, pull, Weakness I + Slowness I 4s, 30-block radius. 60s CD.
-Wild: Passive — Regen I. Active — Vine Grapple: 60 blocks, poison 10s. 20s CD. Disrupt — Root Trap 5x3 at 8 HP, 150 ticks. 20s CD.
-Tide: Passive — Dolphin's Grace II. Active — Wave: 10 wide, 10 tall, knockback, 20 moves, 300 ticks. 120s CD.
-Snout: Passive — Strength I. Active — summon 5 Wither Skeletons (40 HP, 12 dmg, speed 0.25) 90s. 120s CD.
-Rib: Passive — Resistance I. Active — summon 3 Bogged (40 HP, 10 dmg, speed 0.25) 60s. 60s CD.
-Spire: Passive — Speed I. Active — Dash: 8 blocks, 2.0 speed, knockback 1.5, slow 3s, vuln +60% dmg 5s. 30s CD.
-Vex: Passive — Speed I. Active — 8 dmg radius 30, blind+debuff 20s. 120s CD. Disrupt — True Invisibility 10s at 8 HP. 120s CD.
-Ward: Passive — Resistance I. Active — Barrier: Absorption IV + Resistance II, 10s. 120s CD.
-Wayfinder: Passive — Fast sneak. Active — Mark location, teleport infinite range. 120s CD.
-Silence: Passive — Strength I. Active — Warden's Roar radius 15: blind/slow/hunger/glow 20s, disable pearls 10s. 90s CD. Disrupt — Warden's Echo: enemies Weak+Slow, self Resist+Regen, 6-block radius. 120s CD.
-Raiser: Passive — No fall damage. Active — Shockwave: pull all 15 blocks, boost up, disable pearls 10s. 120s CD.
-Host: Passive — Most mobs ignore you. Active — steal 4 HP (2 hearts) + effects, radius 10. 120s CD.
-Flow: Passive — Speed I. Active — Fly 20s, 1 heart/sec, no mace bonus. 60s CD.
-Bolt: Passive — Speed II. Active — Chain lightning: 3 targets, initial 6 dmg, chain 4 dmg, Weakness I 5s, range 20. 20s CD.
-Shaper: No abilities.
-Mythic Rituals: /upgrade opens Ritual menu. Upgrade armor with catalyst items. Build Rage/Charge by fighting (max 100-150). Shift+1 to transform. Ultimates available for: Silence (Warden — 150 rage, 40s, sub-abilities: Boom/Grasp/Leap via Shift+7/8/9), Wild (Overgrowth — 150 charge, 15s, scale 1.3, 30 HP, sub-abilities: Slam/Ensnare/Toxin), Coast (Tidal Lord — 100 charge, 20s, scale 1.2, 40 HP, sub-abilities: Trident/Beam/Dash), Tide (Guardian — 100 charge, 20s, scale 1.15, 30 HP, sub-abilities: Guardian/Water Wall/Vortex/Depth Charge/Blessing).
-Tool Trims (experimental): Apply trims to tools for weapon-specific abilities (melee, ranged, trident, shield, tool). Enabled templates: bolt, silence, wild, vex, dune, ward, coast, wayfinder. Disabled by default.
-Commands: /ptconfig (admin), /upgrade (rituals), /trust <player>, /untrust <player>, /trustlist, /pt resetcooldown.
+Sentry: Resist I. 3 spectral arrows, 0.5 true dmg, 90s. Dune: Haste I + Fire Res I. Sandstorm 15-block tornado, 2dmg/s, 10s, 60s. Eye: Night Vision I. True Sight 80 blocks, 30s, 120s. Coast: Dolphin's Grace I. Water Burst 10dmg, Weak I+Slow I 4s, 30 rad, 60s. Wild: Regen I. Vine Grapple 60 blocks, poison 10s, 20s. Disrupt: Root Trap 5x3 at 8HP. Tide: Dolphin's Grace II. Wave 10 wide, 20 moves, 120s. Snout: Strength I. Summon 5 Wither Skeletons 90s, 120s. Rib: Resist I. Summon 3 Bogged 60s, 60s. Spire: Speed I. Dash 8 blocks, +60% dmg 5s, 30s. Vex: Speed I. 8 dmg rad 30, blind 20s, 120s. Disrupt: Invisible 10s at 8HP. Ward: Resist I. Barrier Absorption IV + Resist II, 10s, 120s. Wayfinder: Fast sneak. Mark teleport, infinite range, 120s. Silence: Strength I. Warden's Roar rad 15: blind/slow/hunger/glow 20s, disable pearls, 90s. Disrupt: Echo Weak+Slow enemies, Resist+Regen self. Raiser: No fall. Shockwave pull 15 blocks, disable pearls, 120s. Host: Mobs ignore. Steal 4HP+effects rad 10, 120s. Flow: Speed I. Fly 20s, 1 heart/s, 60s. Bolt: Speed II. Chain lightning 3 targets, 6+4dmg, Weak I, range 20, 20s. Shaper: None. Mythic Rituals: /upgrade. Ultimates: Silence(Warden 150 rage), Wild(Overgrowth 150 charge), Coast(Tidal Lord 100 charge), Tide(Guardian 100 charge). Tool Trims experimental. Commands: /ptconfig, /upgrade, /trust, /untrust, /trustlist, /pt resetcooldown.
 `;
 
 let playerName = '';
 let msgHistory = [];
 let loading = false;
+let checkinDone = false;
 
 const saved = sessionStorage.getItem('mtm_name');
-if (saved) { document.getElementById('name-input').value = saved; join(); }
+if (saved) { document.getElementById('name-input').value = saved; }
 
 function join() {
   const name = document.getElementById('name-input').value.trim();
@@ -555,13 +1011,50 @@ function join() {
   playerName = name;
   sessionStorage.setItem('mtm_name', name);
   document.getElementById('display-name').textContent = 'Chatting as ' + name;
+  
+  // Particle burst on join
+  fireConfetti();
+  playOpen();
+  
   document.getElementById('join-screen').style.display = 'none';
   document.getElementById('chat-screen').classList.add('active');
   document.getElementById('msg-input').disabled = false;
   document.getElementById('send-btn').disabled = false;
+  document.getElementById('mic-btn').disabled = false;
   document.getElementById('msg-input').focus();
   const area = document.getElementById('msg-area');
   area.innerHTML = '<div class="msg welcome">Ask me anything about Minecraft or the server, ' + name + '.</div>';
+  
+  // Daily check-in
+  doCheckin();
+  
+  // Load saved theme
+  const savedTheme = localStorage.getItem('mtm_theme');
+  if (savedTheme) setTheme(savedTheme);
+}
+
+async function doCheckin() {
+  if (checkinDone) return;
+  try {
+    const res = await fetch(API_URL + '?action=checkin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerName }),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.isNew) {
+      checkinDone = true;
+      fireConfetti();
+      playCheckin();
+      const area = document.getElementById('msg-area');
+      const d = document.createElement('div');
+      d.className = 'msg welcome';
+      d.textContent = '🌟 Day ' + data.streak + ' check-in! +10 XP (Level ' + data.level + ')';
+      area.appendChild(d);
+      area.scrollTop = area.scrollHeight;
+    }
+  } catch(e) {}
 }
 
 function addMsg(role, text, sender) {
@@ -570,18 +1063,9 @@ function addMsg(role, text, sender) {
   if (el) el.remove();
   const d = document.createElement('div');
   d.className = 'msg ' + role;
-  if (sender) {
-    const s = document.createElement('div');
-    s.className = 'sender';
-    s.textContent = sender;
-    d.appendChild(s);
-  }
-  const t = document.createElement('div');
-  t.className = 'text';
-  t.textContent = text;
-  d.appendChild(t);
-  const tm = document.createElement('div');
-  tm.className = 'time';
+  if (sender) { const s = document.createElement('div'); s.className = 'sender'; s.textContent = sender; d.appendChild(s); }
+  const t = document.createElement('div'); t.className = 'text'; t.textContent = text; d.appendChild(t);
+  const tm = document.createElement('div'); tm.className = 'time';
   const n = new Date();
   tm.textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
   d.appendChild(tm);
@@ -593,8 +1077,7 @@ function showTyping() {
   const area = document.getElementById('msg-area');
   const el = document.getElementById('typing-el');
   if (el) el.remove();
-  const d = document.createElement('div');
-  d.id = 'typing-el';
+  const d = document.createElement('div'); d.id = 'typing-el';
   d.className = 'msg bot';
   d.innerHTML = '<div class="sender">MTM</div><div class="text"><span class="typing-indicator"><span></span><span></span><span></span></span></div>';
   area.appendChild(d);
@@ -606,10 +1089,20 @@ async function send() {
   const text = input.value.trim();
   if (!text || loading) return;
   input.value = '';
+  
+  // Check for "/" command palette trigger
+  if (text === '/') { openCmdPalette(); return; }
+  
+  // Intercept /stats command
+  if (text.toLowerCase() === '/stats') {
+    showStats();
+    return;
+  }
+  
   addMsg('user', text, playerName);
   msgHistory.push({ role: 'user', content: text });
-  loading = true;
-  input.disabled = true;
+  playSend();
+  loading = true; input.disabled = true;
   document.getElementById('send-btn').disabled = true;
   document.getElementById('status').textContent = 'thinking...';
   showTyping();
@@ -625,19 +1118,16 @@ async function send() {
         temperature: 0.7,
       })
     });
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(errText || 'HTTP ' + res.status);
-    }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     const reply = data.choices[0].message.content;
     addMsg('bot', reply, 'MTM');
     msgHistory.push({ role: 'assistant', content: reply });
+    playReceive();
   } catch (e) {
     addMsg('bot', '⚠ Error: ' + e.message, 'MTM');
   }
-  loading = false;
-  input.disabled = false;
+  loading = false; input.disabled = false;
   document.getElementById('send-btn').disabled = false;
   document.getElementById('status').textContent = 'ready';
   input.focus();
@@ -645,10 +1135,600 @@ async function send() {
 
 document.getElementById('msg-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  if (e.key === '/' && this.value === '') { e.preventDefault(); openCmdPalette(); }
 });
 document.getElementById('name-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') { e.preventDefault(); join(); }
 });
+
+// ===== Side Menu =====
+let menuSection = null;
+function toggleMenu() {
+  const menu = document.getElementById('side-menu');
+  const overlay = document.getElementById('menu-overlay');
+  menu.classList.toggle('open');
+  overlay.classList.toggle('open');
+  if (!menu.classList.contains('open') && menuSection) goBackToMenu();
+}
+
+function showSection(name) {
+  menuSection = name;
+  document.getElementById('menu-nav').classList.add('hidden');
+  document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
+  const sec = document.getElementById('section-' + name);
+  if (sec) sec.classList.add('active');
+  document.getElementById('menu-back-btn').style.display = '';
+  const titles = { conversations:'Public Conversations', builds:'Build Ideas', polls:'Polls', themes:'Themes', server:'Server Info', about:'About' };
+  document.getElementById('menu-title').textContent = titles[name] || 'Menu';
+  if (name === 'conversations') loadConversations();
+  if (name === 'builds') loadBuilds();
+  if (name === 'polls') loadPolls();
+}
+
+function goBackToMenu() {
+  menuSection = null;
+  document.getElementById('menu-nav').classList.remove('hidden');
+  document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('menu-back-btn').style.display = 'none';
+  document.getElementById('menu-title').textContent = 'Menu';
+}
+
+// ===== Collapsible Menu Categories =====
+function toggleCat(name) {
+  const cat = document.querySelector('.menu-category[data-cat="' + name + '"]');
+  if (!cat) return;
+  const header = cat.querySelector('.menu-cat-header');
+  const body = cat.querySelector('.menu-cat-body');
+  const collapsed = body.classList.toggle('collapsed');
+  header.classList.toggle('collapsed', collapsed);
+  const saved = JSON.parse(localStorage.getItem('mtm_cats') || '{}');
+  saved[name] = collapsed;
+  localStorage.setItem('mtm_cats', JSON.stringify(saved));
+}
+
+function initMenuCats() {
+  const saved = JSON.parse(localStorage.getItem('mtm_cats') || '{}');
+  document.querySelectorAll('.menu-category').forEach(cat => {
+    const name = cat.dataset.cat;
+    const header = cat.querySelector('.menu-cat-header');
+    const body = cat.querySelector('.menu-cat-body');
+    if (saved[name]) {
+      body.classList.add('collapsed');
+      header.classList.add('collapsed');
+    }
+  });
+}
+initMenuCats();
+
+function closeMenu() {
+  document.getElementById('side-menu').classList.remove('open');
+  document.getElementById('menu-overlay').classList.remove('open');
+}
+
+// ===== Theme System =====
+function setTheme(name) {
+  document.documentElement.setAttribute('data-theme', name);
+  localStorage.setItem('mtm_theme', name);
+  document.querySelectorAll('.theme-swatch').forEach(s => {
+    s.classList.toggle('active', s.classList.contains(name));
+  });
+  playTone(600,0.08,'sine',0.03);
+}
+
+// ===== Command Palette =====
+const COMMANDS = [
+  { cmd:'/build', desc:'Random build idea' },
+  { cmd:'/recipe <item>', desc:'Crafting recipe' },
+  { cmd:'/seed', desc:'Random interesting seed' },
+  { cmd:'/roll', desc:'Random origin for you' },
+  { cmd:'/tip', desc:'Pro Minecraft tip' },
+  { cmd:'/challenge', desc:'Random survival challenge' },
+  { cmd:'/invasion', desc:'Custom raid event' },
+  { cmd:'/lore', desc:'Generate lore' },
+  { cmd:'/potion', desc:'Potion recipe suggestion' },
+  { cmd:'/structure', desc:'Interesting structure' },
+  { cmd:'/stats', desc:'Your MTM stats' },
+];
+let cmdHighlight = -1;
+
+function openCmdPalette() {
+  const ol = document.getElementById('cmd-overlay');
+  ol.classList.add('open');
+  const inp = document.getElementById('cmd-input');
+  inp.value = '';
+  cmdHighlight = -1;
+  renderCmdList('');
+  setTimeout(() => inp.focus(), 50);
+}
+
+function closeCmdPalette() {
+  document.getElementById('cmd-overlay').classList.remove('open');
+  document.getElementById('msg-input').focus();
+}
+
+function renderCmdList(filter) {
+  const list = document.getElementById('cmd-list');
+  const f = filter.toLowerCase();
+  const filtered = COMMANDS.filter(c => c.cmd.includes(f) || c.desc.toLowerCase().includes(f));
+  list.innerHTML = filtered.map((c, i) =>
+    '<div class="cmd-item' + (i === cmdHighlight ? ' highlight' : '') + '" data-idx="' + i + '" onclick="executeCmd(\'' + c.cmd.split(' ')[0] + '\')">' +
+    '<span class="cmd-name">' + c.cmd + '</span>' +
+    '<span class="cmd-desc">' + c.desc + '</span>' +
+    '<span class="cmd-arrow">⏎</span></div>'
+  ).join('');
+}
+
+document.getElementById('cmd-input').addEventListener('input', function() {
+  cmdHighlight = -1;
+  renderCmdList(this.value);
+});
+document.getElementById('cmd-input').addEventListener('keydown', function(e) {
+  const items = document.querySelectorAll('.cmd-item');
+  if (e.key === 'ArrowDown') { e.preventDefault(); cmdHighlight = Math.min(cmdHighlight + 1, items.length - 1); renderCmdList(this.value); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); cmdHighlight = Math.max(cmdHighlight - 1, 0); renderCmdList(this.value); }
+  if (e.key === 'Enter' && items[cmdHighlight]) { items[cmdHighlight].click(); }
+  if (e.key === 'Escape') closeCmdPalette();
+});
+
+function executeCmd(cmd) {
+  closeCmdPalette();
+  const input = document.getElementById('msg-input');
+  input.value = cmd + ' ';
+  input.focus();
+}
+
+document.getElementById('cmd-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeCmdPalette();
+});
+
+// Global keyboard shortcut for command palette
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openCmdPalette(); }
+});
+
+// ===== Randomizer Wheel =====
+const wheelCanvas = document.getElementById('wheel-canvas');
+const wctx = wheelCanvas.getContext('2d');
+const wheelItems = {
+  origins: ['Arachnid','Avian','Blazeborn','Elytrian','Enderian','Feline','Merling','Phantom','Shulk','Human','Bard','Centaur','Dragonborn','Dwarf','Elf','Gargoyle','Giant','Naiad','Vampire','Alchemist','Healer','Hypnotist','Necromancer','Spirit','Warlock','Shadowmancer','Bee','Drowned','Evoker','Fox','Slime','Snow Golem','Strider','Witch','Wolf','Guardian','Creeper','Zombie','Skeleton','Warden','Wither Skeleton','Piglin'],
+  builds: ['Medieval Castle','Wizard Tower','Underwater Base','Treehouse Village','Nether Fortress','Sky Island','Mountain Lodge','Desert Pyramid','Viking Longhouse','Floating Islands','Underground City','Japanese Temple','Steampunk Airship','Cottage Core','Giant Statue','Lighthouse','Bridge Fort','Bamboo Garden','Crystal Cave','Mushroom Village'],
+  challenges: ['Beat the game as pacifist','Build a base in the End','No mining challenge','Skyblock style','One block challenge','Speedrun to the Nether','Build a village from scratch','Survive 30 days in hardcore','Underground only for 10 days','Defeat the Warden','Complete all advancements','Build a roller coaster','Breed every animal','Find a ancient city','Defeat the Ender Dragon with only bows'],
+  seeds: ['-7964586902837477571','8679684659486213432','-152595332545277165','7432835054000160883','-3106985258558499904','6384750291837465012','1122334455667788990','9876543210123456789','-1234567890123456789','5556667778889990001'],
+};
+let wheelCat = 'origins';
+let wheelAngle = 0;
+let wheelSpinning = false;
+
+function initWheel() {
+  const cats = document.getElementById('wheel-cats');
+  cats.innerHTML = Object.keys(wheelItems).map(k =>
+    '<button class="' + (k === wheelCat ? 'active' : '') + '" onclick="setWheelCat(\'' + k + '\')">' + k + '</button>'
+  ).join('');
+  drawWheel(0);
+}
+
+function setWheelCat(cat) {
+  wheelCat = cat;
+  document.querySelectorAll('.wheel-cats button').forEach(b => b.classList.toggle('active', b.textContent === cat));
+  document.getElementById('wheel-result').textContent = 'Click Spin!';
+  drawWheel(0);
+}
+
+function drawWheel(rotation) {
+  const items = wheelItems[wheelCat];
+  const seg = (2 * Math.PI) / items.length;
+  const r = 130;
+  wctx.clearRect(0, 0, 280, 280);
+  
+  for (let i = 0; i < items.length; i++) {
+    const startAngle = rotation + i * seg;
+    const endAngle = startAngle + seg;
+    wctx.beginPath();
+    wctx.moveTo(140, 140);
+    wctx.arc(140, 140, r, startAngle, endAngle);
+    wctx.closePath();
+    wctx.fillStyle = i % 2 === 0 ? 'rgba(156,39,176,0.6)' : 'rgba(224,64,251,0.3)';
+    wctx.fill();
+    wctx.strokeStyle = 'rgba(224,64,251,0.1)';
+    wctx.lineWidth = 1;
+    wctx.stroke();
+    
+    // Text
+    if (items.length <= 20) {
+      wctx.save();
+      wctx.translate(140, 140);
+      wctx.rotate(startAngle + seg / 2);
+      wctx.textAlign = 'right';
+      wctx.fillStyle = '#e0e0ff';
+      wctx.font = '10px sans-serif';
+      wctx.fillText(items[i].slice(0, 12), r - 12, 4);
+      wctx.restore();
+    }
+  }
+  
+  // Center circle
+  wctx.beginPath();
+  wctx.arc(140, 140, 20, 0, 2 * Math.PI);
+  wctx.fillStyle = 'rgba(10,10,26,0.8)';
+  wctx.fill();
+  wctx.strokeStyle = 'rgba(224,64,251,0.3)';
+  wctx.lineWidth = 2;
+  wctx.stroke();
+}
+
+function spinWheel() {
+  if (wheelSpinning) return;
+  wheelSpinning = true;
+  document.getElementById('wheel-spin-btn').disabled = true;
+  document.getElementById('wheel-result').textContent = 'Spinning...';
+  
+  const spins = 5 + Math.random() * 5;
+  const targetAngle = wheelAngle + spins * 2 * Math.PI + Math.random() * 2 * Math.PI;
+  const duration = 3000;
+  const start = performance.now();
+  
+  function animate(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = wheelAngle + (targetAngle - wheelAngle) * eased;
+    drawWheel(current);
+    
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      wheelAngle = current % (2 * Math.PI);
+      wheelSpinning = false;
+      document.getElementById('wheel-spin-btn').disabled = false;
+      
+      const items = wheelItems[wheelCat];
+      const seg = (2 * Math.PI) / items.length;
+      const normalized = ((wheelAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      const idx = Math.floor(normalized / seg);
+      const result = items[(items.length - idx) % items.length];
+      document.getElementById('wheel-result').textContent = '🎉 ' + result;
+      playCheckin();
+      fireConfetti();
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function openWheel() { initWheel(); document.getElementById('wheel-overlay').classList.add('open'); }
+function closeWheel() { document.getElementById('wheel-overlay').classList.remove('open'); }
+document.getElementById('wheel-overlay').addEventListener('click', function(e) { if (e.target === this) closeWheel(); });
+
+// ===== Public Conversations =====
+async function shareConversation() {
+  const title = document.getElementById('share-title').value.trim();
+  const status = document.getElementById('share-status');
+  const btn = document.getElementById('share-btn');
+  if (!title) { status.textContent = 'Enter a title.'; return; }
+  if (msgHistory.length === 0) { status.textContent = 'Send a message first.'; return; }
+  btn.disabled = true; status.textContent = 'Posting...';
+  try {
+    const res = await fetch(API_URL + '?action=share', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ playerName, title, messages: msgHistory }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data.ok) {
+      status.textContent = '✓ Posted! +25 XP';
+      document.getElementById('share-title').value = '';
+      loadConversations();
+      setTimeout(() => status.textContent = '', 3000);
+    }
+  } catch(e) { status.textContent = 'Error: ' + e.message; }
+  btn.disabled = false;
+}
+
+async function loadConversations() {
+  const list = document.getElementById('feed-list');
+  const loading = document.getElementById('feed-loading');
+  const empty = document.getElementById('feed-empty');
+  loading.style.display = ''; list.innerHTML = ''; empty.style.display = 'none';
+  try {
+    const res = await fetch(API_URL + '?action=conversations');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    loading.style.display = 'none';
+    if (!data || data.length === 0) { empty.style.display = ''; return; }
+    for (const c of data) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.onclick = () => openConvoDetail(c);
+      const time = c.timestamp ? new Date(c.timestamp).toLocaleDateString() : '?';
+      card.innerHTML = '<div class="c-title">' + esc(c.title) + '</div><div class="c-meta"><span>' + esc(c.playerName) + '</span><span>' + time + '</span><span class="c-badge">' + c.messageCount + ' msgs</span></div><div class="c-preview">' + esc(c.preview) + '</div>';
+      list.appendChild(card);
+    }
+  } catch(e) { loading.textContent = 'Failed to load: ' + e.message; }
+}
+
+function openConvoDetail(c) {
+  document.getElementById('convo-detail').classList.add('active');
+  document.querySelector('#section-conversations .feed-title').style.display = 'none';
+  document.getElementById('feed-loading').style.display = 'none';
+  document.getElementById('feed-list').style.display = 'none';
+  document.getElementById('feed-empty').style.display = 'none';
+  document.getElementById('cd-title').textContent = c.title;
+  const time = c.timestamp ? new Date(c.timestamp).toLocaleString() : '?';
+  document.getElementById('cd-meta').textContent = c.playerName + ' · ' + time + ' · ' + c.messageCount + ' messages';
+  const msgs = document.getElementById('cd-msgs');
+  msgs.innerHTML = '';
+  for (const m of (c.messages || [])) {
+    const d = document.createElement('div');
+    d.className = 'cd-msg ' + m.role;
+    const sender = m.role === 'user' ? c.playerName : 'MTM';
+    d.innerHTML = '<div class="cd-sender">' + sender + '</div>' + esc(m.content);
+    msgs.appendChild(d);
+  }
+}
+
+function closeConvoDetail() {
+  document.getElementById('convo-detail').classList.remove('active');
+  document.querySelector('#section-conversations .feed-title').style.display = '';
+  document.getElementById('feed-list').style.display = '';
+}
+
+// ===== Builds =====
+async function submitBuild() {
+  const title = document.getElementById('build-title').value.trim();
+  const desc = document.getElementById('build-desc').value.trim();
+  const mats = document.getElementById('build-mats').value.trim();
+  const biome = document.getElementById('build-biome').value.trim();
+  const status = document.getElementById('build-status');
+  if (!title || !desc) { status.textContent = 'Title and description required.'; return; }
+  const btn = document.getElementById('build-submit-btn');
+  btn.disabled = true; status.textContent = 'Posting...';
+  try {
+    const res = await fetch(API_URL + '?action=build-add', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, description: desc, materials: mats, biome: biome || 'Any', playerName }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    status.textContent = '✓ Posted! +10 XP';
+    document.getElementById('build-title').value = '';
+    document.getElementById('build-desc').value = '';
+    document.getElementById('build-mats').value = '';
+    document.getElementById('build-biome').value = '';
+    loadBuilds();
+    setTimeout(() => status.textContent = '', 3000);
+  } catch(e) { status.textContent = 'Error: ' + e.message; }
+  btn.disabled = false;
+}
+
+async function loadBuilds() {
+  const list = document.getElementById('builds-list');
+  const loading = document.getElementById('builds-loading');
+  const empty = document.getElementById('builds-empty');
+  loading.style.display = ''; list.innerHTML = ''; empty.style.display = 'none';
+  try {
+    const res = await fetch(API_URL + '?action=builds');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    loading.style.display = 'none';
+    if (!data || data.length === 0) { empty.style.display = ''; return; }
+    for (const b of data) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const time = b.timestamp ? new Date(b.timestamp).toLocaleDateString() : '?';
+      const voted = b.voters?.includes(playerName);
+      card.innerHTML = '<div class="c-title">' + esc(b.title) + '</div><div class="c-meta"><span>' + esc(b.playerName) + '</span><span>' + time + '</span><span class="c-badge">' + esc(b.biome) + '</span></div><div class="c-preview">' + esc(b.description.slice(0, 120)) + '</div>' + (b.materials ? '<div class="build-mats">🧱 ' + esc(b.materials) + '</div>' : '') + '<div class="build-upvote"><button class="' + (voted ? 'voted' : '') + '" onclick="event.stopPropagation();upvoteBuild(\'' + b.id + '\', this)">' + (voted ? '★' : '☆') + '</button> <span>' + (b.upvotes || 0) + '</span></div>';
+      card.onclick = () => {
+        document.getElementById('build-desc').value = b.description;
+        document.getElementById('build-mats').value = b.materials || '';
+      };
+      list.appendChild(card);
+    }
+  } catch(e) { loading.textContent = 'Failed to load: ' + e.message; }
+}
+
+async function upvoteBuild(id, btn) {
+  if (btn.classList.contains('voted')) return;
+  try {
+    const res = await fetch(API_URL + '?action=build-upvote', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ buildId: id, playerName }),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    btn.classList.add('voted');
+    btn.textContent = '★';
+    btn.nextElementSibling.textContent = data.upvotes;
+  } catch(e) {}
+}
+
+// ===== Polls =====
+async function createPoll() {
+  const q = document.getElementById('poll-question').value.trim();
+  const opts = [document.getElementById('poll-opt1').value.trim(), document.getElementById('poll-opt2').value.trim()];
+  if (!q || opts.some(o => !o)) { document.getElementById('poll-status').textContent = 'Question + at least 2 options required.'; return; }
+  const opt3 = document.getElementById('poll-opt3').value.trim();
+  const opt4 = document.getElementById('poll-opt4').value.trim();
+  if (opt3) opts.push(opt3);
+  if (opt4) opts.push(opt4);
+  document.getElementById('poll-status').textContent = 'Creating...';
+  try {
+    const res = await fetch(API_URL + '?action=poll-create', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: q, options: opts, playerName }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    document.getElementById('poll-status').textContent = '✓ Created!';
+    document.getElementById('poll-question').value = '';
+    document.getElementById('poll-opt1').value = '';
+    document.getElementById('poll-opt2').value = '';
+    document.getElementById('poll-opt3').value = '';
+    document.getElementById('poll-opt4').value = '';
+    loadPolls();
+    setTimeout(() => document.getElementById('poll-status').textContent = '', 3000);
+  } catch(e) { document.getElementById('poll-status').textContent = 'Error: ' + e.message; }
+}
+
+async function loadPolls() {
+  const list = document.getElementById('polls-list');
+  const loading = document.getElementById('polls-loading');
+  const empty = document.getElementById('polls-empty');
+  loading.style.display = ''; list.innerHTML = ''; empty.style.display = 'none';
+  try {
+    const res = await fetch(API_URL + '?action=polls');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    loading.style.display = 'none';
+    if (!data || data.length === 0) { empty.style.display = ''; return; }
+    for (const p of data) {
+      const total = p.options.reduce((s, o) => s + o.votes, 0);
+      const voted = p.voters?.includes(playerName);
+      const card = document.createElement('div');
+      card.className = 'poll-card';
+      card.innerHTML = '<div class="p-title">' + esc(p.title) + '</div>' +
+        p.options.map((o, i) => {
+          const pct = total > 0 ? Math.round(o.votes / total * 100) : 0;
+          return '<div class="p-option" onclick="' + (voted ? '' : 'votePoll(\'' + p.id + '\',' + i + ',this)') + '">' +
+            '<span class="p-label">' + esc(o.text) + '</span>' +
+            '<div class="p-bar-wrap"><div class="p-bar" style="width:' + pct + '%"></div></div>' +
+            '<span class="p-pct">' + pct + '%</span></div>';
+        }).join('') +
+        '<div class="p-voted">' + (voted ? '✓ Voted' : (total + ' total votes')) + '</div>';
+      list.appendChild(card);
+    }
+  } catch(e) { loading.textContent = 'Failed to load: ' + e.message; }
+}
+
+async function votePoll(pollId, optIdx, el) {
+  try {
+    const res = await fetch(API_URL + '?action=poll-vote', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pollId, optionIndex: optIdx, playerName }),
+    });
+    if (!res.ok) return;
+    loadPolls();
+    playTone(660, 0.08, 'sine', 0.04);
+  } catch(e) {}
+}
+
+// ===== Player Stats (/stats) =====
+async function showStats() {
+  const area = document.getElementById('msg-area');
+  const el = document.getElementById('typing-el');
+  if (el) el.remove();
+  try {
+    const res = await fetch(API_URL + '?action=stats&player=' + encodeURIComponent(playerName));
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const d = document.createElement('div');
+    d.className = 'msg bot';
+    d.innerHTML = '<div class="sender">MTM</div><div class="text">📊 Stats for ' + playerName + '\nLevel: ' + (data.level || 1) + '\nXP: ' + (data.xp || 0) + '\nTotal Chats: ' + (data.chats || 0) + '\nCheck-In Streak: ' + (data.streak || 0) + ' days\n\nView full leaderboard at /leaderboard.html</div>';
+    const tm = document.createElement('div'); tm.className = 'time';
+    const n = new Date(); tm.textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+    d.appendChild(tm);
+    area.appendChild(d);
+    area.scrollTop = area.scrollHeight;
+  } catch(e) {
+    addMsg('bot', '⚠ Could not load stats: ' + e.message, 'MTM');
+  }
+}
+
+// ===== Build Challenge =====
+async function startChallenge() {
+  const btn = document.getElementById('challenge-btn');
+  btn.disabled = true;
+  const cat = document.getElementById('challenge-cat').value;
+  const themes = {
+    build: ['Medieval Castle','Underwater Base','Nether Fortress','Sky Island','Treehouse Village','Wizard Tower','Mountain Lodge','Desert Pyramid','Viking Longhouse','Floating Islands','Underground City','Japanese Temple','Steampunk Airship','Cottage Core','Giant Statue'],
+    biome: ['Plains','Desert','Taiga','Swamp','Jungle','Badlands','Snowy Tundra','Mushroom Fields','Ocean','Nether','End','Cherry Grove','Savanna','Dark Forest','Windswept Hills'],
+    constraint: ['Only stone & wood','No torches','Monochrome palette','Must have a farm','On a mountain peak','Underground only','Over water','Must be symmetrical','Only 1 type of wood','Round shapes only','Must include a statue','Surrounded by water','On a cliff edge','Hidden entrance','Must have a roof garden'],
+  };
+  const theme = themes.build[Math.floor(Math.random() * themes.build.length)];
+  const biome = themes.biome[Math.floor(Math.random() * themes.biome.length)];
+  const con1 = themes.constraint[Math.floor(Math.random() * themes.constraint.length)];
+  let con2 = themes.constraint[Math.floor(Math.random() * themes.constraint.length)];
+  while (con2 === con1) con2 = themes.constraint[Math.floor(Math.random() * themes.constraint.length)];
+  document.getElementById('challenge-result').innerHTML =
+    '🎯 <strong>' + theme + '</strong><br>📍 Biome: ' + biome + '<br>📏 Rules: ' + con1 + ' + ' + con2 +
+    '<br><br>Post your build below and share it!';
+  btn.disabled = false;
+}
+
+// ===== Speech Recognition (Mic) =====
+let speechRec = null;
+let isListening = false;
+
+function toggleMic() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    document.getElementById('mic-icon').textContent = '🎤';
+    document.getElementById('msg-input').placeholder = 'Voice input not supported in this browser.';
+    return;
+  }
+
+  if (isListening) {
+    stopListening();
+    return;
+  }
+
+  if (!speechRec) {
+    speechRec = new SpeechRecognition();
+    speechRec.continuous = false;
+    speechRec.interimResults = true;
+    speechRec.lang = 'en-US';
+
+    speechRec.onresult = function(e) {
+      let final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      }
+      if (final) {
+        const input = document.getElementById('msg-input');
+        input.value = final;
+        input.focus();
+        setTimeout(() => send(), 100);
+      } else {
+        const input = document.getElementById('msg-input');
+        input.value = e.results[e.results.length - 1][0].transcript;
+      }
+    };
+
+    speechRec.onerror = function(e) {
+      stopListening();
+      if (e.error === 'not-allowed') {
+        document.getElementById('mic-icon').textContent = '🎤';
+        document.getElementById('msg-input').placeholder = 'Microphone access denied.';
+      }
+    };
+
+    speechRec.onend = function() {
+      stopListening();
+    };
+  }
+
+  try {
+    speechRec.start();
+    isListening = true;
+    document.getElementById('mic-btn').classList.add('listening');
+    document.getElementById('mic-icon').textContent = '🎙️';
+    document.getElementById('msg-input').placeholder = 'Listening...';
+    playTone(600, 0.08, 'sine', 0.05);
+  } catch(e) {
+    stopListening();
+  }
+}
+
+function stopListening() {
+  isListening = false;
+  document.getElementById('mic-btn').classList.remove('listening');
+  document.getElementById('mic-icon').textContent = '🎤';
+  document.getElementById('msg-input').placeholder = 'Ask MTM anything...';
+  try { if (speechRec) speechRec.stop(); } catch(e) {}
+}
+
+// ===== Utility =====
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
 </script>
 </body>
 </html>

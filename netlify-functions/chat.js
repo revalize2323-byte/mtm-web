@@ -11,68 +11,297 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
+function getDataStore() {
+  return getStore('mtm-data');
+}
+
+function getLogStore() {
+  return getStore('mtm-logs');
+}
+
+async function getJSON(store, key, fallback = null) {
+  const raw = await store.get(key);
+  return raw ? JSON.parse(raw) : fallback;
+}
+
+async function setJSON(store, key, data) {
+  await store.set(key, JSON.stringify(data));
+}
+
+async function getXP(player) {
+  const store = getDataStore();
+  const all = await getJSON(store, 'xp', {});
+  return all[player] || { xp: 0, level: 1, chats: 0, lastCheckIn: null, streak: 0 };
+}
+
+async function addXP(player, amount) {
+  const store = getDataStore();
+  const all = await getJSON(store, 'xp', {});
+  const p = all[player] || { xp: 0, level: 1, chats: 0, lastCheckIn: null, streak: 0 };
+  p.xp += amount;
+  p.chats = (p.chats || 0) + 1;
+  p.level = Math.floor(Math.sqrt(p.xp / 20)) + 1;
+  all[player] = p;
+  await setJSON(store, 'xp', all);
+  return p;
+}
+
+// ===== Main Handler =====
 exports.handler = async function (event) {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers, body: '' };
   }
 
+  const q = event.queryStringParameters || {};
+  const action = q.action || '';
+
+  // ---- GET endpoints ----
   if (event.httpMethod === 'GET') {
-    const pw = event.queryStringParameters?.pw;
-    if (pw !== ADMIN_PW) {
-      return { statusCode: 401, headers, body: JSON.stringify({ error: 'unauthorized' }) };
-    }
     try {
-      const store = getStore('mtm-logs');
-      const raw = await store.get('logs');
-      const logs = raw ? JSON.parse(raw) : [];
-      return { statusCode: 200, headers, body: JSON.stringify(logs) };
+      const store = getDataStore();
+
+      // Public conversations
+      if (action === 'conversations') {
+        const raw = await getLogStore().get('public-conversations');
+        return { statusCode: 200, headers, body: raw || '[]' };
+      }
+
+      // Player stats
+      if (action === 'stats') {
+        const all = await getJSON(store, 'xp', {});
+        const player = q.player || '';
+        if (player) {
+          const p = all[player] || { xp: 0, level: 1, chats: 0, streak: 0 };
+          return { statusCode: 200, headers, body: JSON.stringify(p) };
+        }
+        return { statusCode: 200, headers, body: JSON.stringify(all) };
+      }
+
+      // Leaderboard
+      if (action === 'leaderboard') {
+        const all = await getJSON(store, 'xp', {});
+        const list = Object.entries(all).map(([name, data]) => ({ player: name, ...data }));
+        list.sort((a, b) => (b.xp || 0) - (a.xp || 0));
+        return { statusCode: 200, headers, body: JSON.stringify(list.slice(0, 100)) };
+      }
+
+      // Polls
+      if (action === 'polls') {
+        const polls = await getJSON(store, 'polls', []);
+        return { statusCode: 200, headers, body: JSON.stringify(polls) };
+      }
+
+      // Builds
+      if (action === 'builds') {
+        const builds = await getJSON(store, 'builds', []);
+        builds.sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0));
+        return { statusCode: 200, headers, body: JSON.stringify(builds.slice(0, 200)) };
+      }
+
+      // Admin logs
+      if (q.pw === ADMIN_PW) {
+        const raw = await getLogStore().get('logs');
+        return { statusCode: 200, headers, body: raw || '[]' };
+      }
+
+      return { statusCode: 404, headers, body: JSON.stringify({ error: 'unknown action' }) };
     } catch (e) {
       return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
     }
   }
 
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'POST only' }) };
-  }
-
-  try {
-    const body = JSON.parse(event.body);
-    console.log(`[MTM] Chat from ${body.playerName || '?'}: "${(body.messages?.filter(m => m.role === 'user').pop()?.content || '').slice(0, 80)}"`);
-
-    const res = await fetch(CEREBRAS_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${CEREBRAS_KEY}`,
-      },
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
-    const reply = data.choices?.[0]?.message?.content || '';
-
-    console.log(`[MTM] Reply to ${body.playerName || '?'}: "${reply.slice(0, 80)}"`);
-
+  // ---- POST endpoints ----
+  if (event.httpMethod === 'POST') {
     try {
-      const store = getStore('mtm-logs');
-      const raw = await store.get('logs');
-      const logs = raw ? JSON.parse(raw) : [];
-      const userMsgs = body.messages?.filter(m => m.role === 'user');
-      logs.push({
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        player: body.playerName || 'unknown',
-        message: userMsgs?.[userMsgs.length - 1]?.content || '',
-        response: reply,
-        tokens: data.usage?.total_tokens || 0,
-      });
-      await store.set('logs', JSON.stringify(logs.slice(-1000)));
-    } catch (logErr) {
-      console.error('[MTM] Log store error:', logErr);
-    }
+      const body = JSON.parse(event.body);
 
-    return { statusCode: res.status, headers, body: JSON.stringify(data) };
-  } catch (e) {
-    console.error('[MTM] Error:', e.message);
-    return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
+      // Share conversation
+      if (action === 'share') {
+        const { playerName, title, messages } = body;
+        if (!title || !messages || messages.length === 0) {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'title and messages required' }) };
+        }
+        const logStore = getLogStore();
+        const raw = await logStore.get('public-conversations');
+        const list = raw ? JSON.parse(raw) : [];
+        list.unshift({
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          playerName: playerName || 'Anonymous',
+          title: title.slice(0, 100),
+          timestamp: new Date().toISOString(),
+          messageCount: messages.length,
+          preview: messages[0]?.content?.slice(0, 100) || '',
+          messages: messages,
+        });
+        await logStore.set('public-conversations', JSON.stringify(list.slice(0, 200)));
+        // XP for sharing
+        if (playerName) await addXP(playerName, 25);
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: true }) };
+      }
+
+      // Daily check-in
+      if (action === 'checkin') {
+        const player = body.playerName;
+        if (!player) return { statusCode: 400, headers, body: JSON.stringify({ error: 'playerName required' }) };
+        const store = getDataStore();
+        const all = await getJSON(store, 'xp', {});
+        const p = all[player] || { xp: 0, level: 1, chats: 0, lastCheckIn: null, streak: 0 };
+        const now = new Date();
+        const today = now.toISOString().slice(0, 10);
+        let isNew = false;
+        if (p.lastCheckIn !== today) {
+          isNew = true;
+          const yesterday = new Date(now);
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yStr = yesterday.toISOString().slice(0, 10);
+          p.streak = p.lastCheckIn === yStr ? (p.streak || 0) + 1 : 1;
+          p.lastCheckIn = today;
+          p.xp += 10;
+          p.level = Math.floor(Math.sqrt(p.xp / 20)) + 1;
+          all[player] = p;
+          await setJSON(store, 'xp', all);
+        }
+        return { statusCode: 200, headers, body: JSON.stringify({ streak: p.streak || 0, xp: p.xp, level: p.level, isNew }) };
+      }
+
+      // Create poll
+      if (action === 'poll-create') {
+        const { title, options, playerName } = body;
+        if (!title || !options || options.length < 2) {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'title and at least 2 options required' }) };
+        }
+        const store = getDataStore();
+        const polls = await getJSON(store, 'polls', []);
+        polls.unshift({
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          title: title.slice(0, 200),
+          options: options.map(o => ({ text: o.slice(0, 100), votes: 0 })),
+          createdBy: playerName || 'Anonymous',
+          timestamp: new Date().toISOString(),
+          voters: [],
+        });
+        await setJSON(store, 'polls', JSON.stringify(polls.slice(0, 100)));
+        if (playerName) await addXP(playerName, 5);
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: true }) };
+      }
+
+      // Vote on poll
+      if (action === 'poll-vote') {
+        const { pollId, optionIndex, playerName } = body;
+        if (pollId === undefined || optionIndex === undefined) {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'pollId and optionIndex required' }) };
+        }
+        const store = getDataStore();
+        const polls = await getJSON(store, 'polls', []);
+        const poll = polls.find(p => p.id === pollId);
+        if (!poll) return { statusCode: 404, headers, body: JSON.stringify({ error: 'poll not found' }) };
+        if (poll.voters?.includes(playerName)) {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'already voted' }) };
+        }
+        if (optionIndex < 0 || optionIndex >= poll.options.length) {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'invalid option' }) };
+        }
+        poll.options[optionIndex].votes += 1;
+        if (!poll.voters) poll.voters = [];
+        if (playerName) poll.voters.push(playerName);
+        await setJSON(store, 'polls', polls);
+        if (playerName) await addXP(playerName, 2);
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: true }) };
+      }
+
+      // Add build idea
+      if (action === 'build-add') {
+        const { title, description, materials, biome, playerName } = body;
+        if (!title || !description) {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'title and description required' }) };
+        }
+        const store = getDataStore();
+        const builds = await getJSON(store, 'builds', []);
+        builds.unshift({
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          title: title.slice(0, 200),
+          description: description.slice(0, 1000),
+          materials: (materials || '').slice(0, 500),
+          biome: (biome || 'Any').slice(0, 50),
+          playerName: playerName || 'Anonymous',
+          timestamp: new Date().toISOString(),
+          upvotes: 0,
+          voters: [],
+        });
+        await setJSON(store, 'builds', builds.slice(0, 200));
+        if (playerName) await addXP(playerName, 10);
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: true }) };
+      }
+
+      // Upvote build
+      if (action === 'build-upvote') {
+        const { buildId, playerName } = body;
+        if (!buildId) return { statusCode: 400, headers, body: JSON.stringify({ error: 'buildId required' }) };
+        const store = getDataStore();
+        const builds = await getJSON(store, 'builds', []);
+        const build = builds.find(b => b.id === buildId);
+        if (!build) return { statusCode: 404, headers, body: JSON.stringify({ error: 'build not found' }) };
+        if (build.voters?.includes(playerName)) {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'already upvoted' }) };
+        }
+        build.upvotes = (build.upvotes || 0) + 1;
+        if (!build.voters) build.voters = [];
+        if (playerName) build.voters.push(playerName);
+        await setJSON(store, 'builds', builds);
+        if (playerName) await addXP(playerName, 1);
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: true, upvotes: build.upvotes }) };
+      }
+
+      // ===== Default: Chat proxy =====
+      console.log(`[MTM] Chat from ${body.playerName || '?'}: "${(body.messages?.filter(m => m.role === 'user').pop()?.content || '').slice(0, 80)}"`);
+
+      const res = await fetch(CEREBRAS_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${CEREBRAS_KEY}`,
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      const reply = data.choices?.[0]?.message?.content || '';
+
+      console.log(`[MTM] Reply to ${body.playerName || '?'}: "${reply.slice(0, 80)}"`);
+
+      // Log to blob
+      try {
+        const logStore = getLogStore();
+        const raw = await logStore.get('logs');
+        const logs = raw ? JSON.parse(raw) : [];
+        const userMsgs = body.messages?.filter(m => m.role === 'user');
+        logs.push({
+          id: Date.now(),
+          timestamp: new Date().toISOString(),
+          player: body.playerName || 'unknown',
+          message: userMsgs?.[userMsgs.length - 1]?.content || '',
+          response: reply,
+          tokens: data.usage?.total_tokens || 0,
+        });
+        await logStore.set('logs', JSON.stringify(logs.slice(-1000)));
+      } catch (logErr) {
+        console.error('[MTM] Log store error:', logErr);
+      }
+
+      // Grant XP
+      if (body.playerName) {
+        try {
+          await addXP(body.playerName, 5);
+        } catch (xpErr) {
+          console.error('[MTM] XP error:', xpErr);
+        }
+      }
+
+      return { statusCode: res.status, headers, body: JSON.stringify(data) };
+    } catch (e) {
+      console.error('[MTM] Error:', e.message);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
+    }
   }
+
+  return { statusCode: 405, headers, body: JSON.stringify({ error: 'POST or GET only' }) };
 };
