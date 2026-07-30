@@ -255,51 +255,68 @@ exports.handler = async function (event) {
       // ===== Default: Chat proxy =====
       console.log(`[MTM] Chat from ${body.playerName || '?'}: "${(body.messages?.filter(m => m.role === 'user').pop()?.content || '').slice(0, 80)}"`);
 
-      const res = await fetch(CEREBRAS_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${CEREBRAS_KEY}`,
-        },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      const reply = data.choices?.[0]?.message?.content || '';
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      let res;
+      try {
+        res = await fetch(CEREBRAS_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${CEREBRAS_KEY}`,
+          },
+          body: JSON.stringify(body),
+          signal: controller.signal,
+        });
+      } catch (fetchErr) {
+        clearTimeout(timeout);
+        throw new Error('Cerebras API error: ' + fetchErr.message);
+      }
+      clearTimeout(timeout);
+
+      let data, reply;
+      try {
+        data = await res.json();
+        reply = data.choices?.[0]?.message?.content || '';
+      } catch (parseErr) {
+        throw new Error('Cerebras response parse error: ' + parseErr.message);
+      }
 
       console.log(`[MTM] Reply to ${body.playerName || '?'}: "${reply.slice(0, 80)}"`);
 
-      // Log to blob
-      try {
-        const logStore = getLogStore();
-        const raw = await logStore.get('logs');
-        const logs = raw ? JSON.parse(raw) : [];
-        const userMsgs = body.messages?.filter(m => m.role === 'user');
-        logs.push({
-          id: Date.now(),
-          timestamp: new Date().toISOString(),
-          player: body.playerName || 'unknown',
-          message: userMsgs?.[userMsgs.length - 1]?.content || '',
-          response: reply,
-          tokens: data.usage?.total_tokens || 0,
-        });
-        await logStore.set('logs', JSON.stringify(logs.slice(-1000)));
-      } catch (logErr) {
-        console.error('[MTM] Log store error:', logErr);
-      }
-
-      // Grant XP
-      if (body.playerName) {
+      // Fire-and-forget: blob logging + XP (don't block response)
+      const ctx = { body, reply, data };
+      setTimeout(async () => {
         try {
-          await addXP(body.playerName, 5);
-        } catch (xpErr) {
-          console.error('[MTM] XP error:', xpErr);
+          const logStore = getLogStore();
+          const raw = await logStore.get('logs');
+          const logs = raw ? JSON.parse(raw) : [];
+          const userMsgs = ctx.body.messages?.filter(m => m.role === 'user');
+          logs.push({
+            id: Date.now(),
+            timestamp: new Date().toISOString(),
+            player: ctx.body.playerName || 'unknown',
+            message: userMsgs?.[userMsgs.length - 1]?.content || '',
+            response: ctx.reply,
+            tokens: ctx.data.usage?.total_tokens || 0,
+          });
+          await logStore.set('logs', JSON.stringify(logs.slice(-1000)));
+        } catch (logErr) {
+          console.error('[MTM] Log store error:', logErr.message);
         }
-      }
+        if (ctx.body.playerName) {
+          try {
+            await addXP(ctx.body.playerName, 5);
+          } catch (xpErr) {
+            console.error('[MTM] XP error:', xpErr.message);
+          }
+        }
+      }, 0);
 
       return { statusCode: res.status, headers, body: JSON.stringify(data) };
     } catch (e) {
       console.error('[MTM] Error:', e.message);
-      return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
+      return { statusCode: 500, headers, body: JSON.stringify({ error: 'Chat error: ' + e.message }) };
     }
   }
 
