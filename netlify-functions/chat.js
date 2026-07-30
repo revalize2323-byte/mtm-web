@@ -1,8 +1,13 @@
 let getStore = null;
 try {
+  if (typeof Netlify !== 'undefined' && Netlify.blobs) {
+    getStore = Netlify.blobs.getStore || Netlify.blobs;
+  }
+} catch(e) {}
+try {
   const blobs = require('@netlify/blobs');
-  getStore = blobs.getStore;
-} catch (e) {
+  if (blobs.getStore) getStore = blobs.getStore;
+} catch(e) {
   console.error('[MTM] Blobs unavailable:', e.message);
 }
 
