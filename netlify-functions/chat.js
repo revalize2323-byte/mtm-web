@@ -116,6 +116,22 @@ exports.handler = async function (event) {
         return { statusCode: 200, headers, body: JSON.stringify(builds.slice(0, 200)) };
       }
 
+      // Kudos
+      if (action === 'kudos') {
+        const all = await getJSON(store, 'kudos', {});
+        const list = Object.entries(all).map(([name, data]) => ({ player: name, count: data.count || 0, recent: (data.recent || []).slice(0, 5) }));
+        list.sort((a, b) => (b.count || 0) - (a.count || 0));
+        return { statusCode: 200, headers, body: JSON.stringify(list.slice(0, 100)) };
+      }
+
+      // Events
+      if (action === 'events') {
+        const events = await getJSON(store, 'events', []);
+        const now = new Date().toISOString();
+        const upcoming = events.filter(e => e.dateTime > now).sort((a, b) => a.dateTime.localeCompare(b.dateTime));
+        return { statusCode: 200, headers, body: JSON.stringify(upcoming.slice(0, 50)) };
+      }
+
       // Admin logs
       if (q.pw === ADMIN_PW) {
         const ls = getLogStore();
@@ -270,6 +286,46 @@ exports.handler = async function (event) {
         await setJSON(store, 'builds', builds);
         if (playerName) await addXP(playerName, 1);
         return { statusCode: 200, headers, body: JSON.stringify({ ok: true, upvotes: build.upvotes }) };
+      }
+
+      // Give kudos
+      if (action === 'kudos') {
+        const { targetPlayer, fromPlayer, message } = body;
+        if (!targetPlayer || !fromPlayer) {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'targetPlayer and fromPlayer required' }) };
+        }
+        if (targetPlayer === fromPlayer) {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'cannot kudo yourself' }) };
+        }
+        const store = getDataStore();
+        const all = await getJSON(store, 'kudos', {});
+        if (!all[targetPlayer]) all[targetPlayer] = { count: 0, recent: [] };
+        all[targetPlayer].count += 1;
+        all[targetPlayer].recent.unshift({ from: fromPlayer, message: (message || '').slice(0, 200), time: new Date().toISOString() });
+        await setJSON(store, 'kudos', all);
+        if (fromPlayer) await addXP(fromPlayer, 3);
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: true, count: all[targetPlayer].count }) };
+      }
+
+      // Create event
+      if (action === 'event-create') {
+        const { title, dateTime, description, playerName } = body;
+        if (!title || !dateTime) {
+          return { statusCode: 400, headers, body: JSON.stringify({ error: 'title and dateTime required' }) };
+        }
+        const store = getDataStore();
+        const events = await getJSON(store, 'events', []);
+        events.push({
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          title: title.slice(0, 200),
+          dateTime,
+          description: (description || '').slice(0, 1000),
+          createdBy: playerName || 'Anonymous',
+          createdAt: new Date().toISOString(),
+        });
+        await setJSON(store, 'events', events.slice(-200));
+        if (playerName) await addXP(playerName, 5);
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: true }) };
       }
 
       // ===== Default: Chat proxy =====

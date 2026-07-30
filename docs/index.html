@@ -147,10 +147,12 @@ body {
 
 .join-tip {
   color: var(--text3); font-size: 12px; margin-top: 20px;
-  min-height: 18px; transition: opacity 0.5s;
+  min-height: 18px; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity 0.5s;
 }
-.join-tip span { cursor: pointer; }
-.join-tip .tip-arrow { color: var(--text3); margin: 0 6px; cursor: pointer; }
+.join-tip .tip-arrow { color: var(--text3); cursor: pointer; user-select: none; font-size: 10px; padding: 4px; border-radius: 4px; transition: all 0.2s; }
+.join-tip .tip-arrow:hover { color: var(--accent2); background: var(--hover); }
+.join-tip .tip-text { min-height: 18px; transition: opacity 0.5s; }
 
 .join-footer {
   position: absolute; bottom: 24px; z-index: 2;
@@ -322,8 +324,9 @@ body {
 .menu-item .arrow { color: var(--text3); font-size: 12px; }
 .menu-divider { height: 1px; background: var(--border); margin: 6px 14px; }
 
-.menu-section { display: none; padding: 12px 18px; }
+.menu-section { display: none; padding: 12px 18px; animation: fadeSlideIn 0.25s ease; }
 .menu-section.active { display: block; }
+@keyframes fadeSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ---- Menu Sections ---- */
 .section-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
@@ -334,7 +337,7 @@ body {
   color: var(--text); font-size: 13px; outline: none; width: 100%;
   margin-bottom: 8px; font-family: inherit;
 }
-.menu-section input:focus, .menu-section textarea:focus { border-color: var(--accent2); }
+.menu-section input:focus, .menu-section textarea:focus, .menu-section select:focus { border-color: var(--accent2); box-shadow: 0 0 12px var(--glow2); }
 .menu-section textarea { resize: vertical; min-height: 60px; }
 .menu-section .btn-s {
   padding: 8px 18px;
@@ -400,11 +403,11 @@ body {
 .feed-loading { text-align: center; padding: 20px 0; color: var(--text3); font-size: 12px; }
 
 .card {
-  background: var(--msg-bot); border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px 14px; margin-bottom: 8px;
-  cursor: pointer; transition: all 0.2s;
+  background: var(--bg2); backdrop-filter: blur(8px); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px; margin-bottom: 8px; cursor: pointer;
+  transition: all 0.25s ease;
 }
-.card:hover { border-color: var(--border2); }
+.card:hover { border-color: var(--border2); box-shadow: 0 2px 16px var(--glow2); transform: translateY(-1px); }
 .card .c-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
 .card .c-meta { font-size: 11px; color: var(--text3); display: flex; gap: 10px; flex-wrap: wrap; }
 .card .c-preview { font-size: 12px; color: var(--text); opacity: 0.5; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -427,7 +430,8 @@ body {
 .cd-sender { font-size: 10px; font-weight: 600; margin-bottom: 3px; opacity: 0.6; }
 
 /* ---- Polls ---- */
-.poll-card { background: var(--msg-bot); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+.poll-card { background: var(--msg-bot); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; transition: all 0.25s; }
+.poll-card:hover { border-color: var(--border2); box-shadow: 0 2px 16px var(--glow2); }
 .poll-card .p-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
 .poll-card .p-option { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s; }
 .poll-card .p-option:last-child { border-bottom: none; }
@@ -437,8 +441,6 @@ body {
 .poll-card .p-option .p-label { font-size: 13px; min-width: 100px; }
 .poll-card .p-option .p-pct { font-size: 12px; color: var(--text3); min-width: 36px; text-align: right; }
 .poll-card .p-voted { font-size: 11px; color: var(--text3); margin-top: 6px; }
-.poll-card .p-vote-btn { font-size: 12px; color: var(--accent2); cursor: pointer; background: none; border: none; }
-.poll-card .p-vote-btn:hover { text-decoration: underline; }
 
 /* ---- Builds ---- */
 .build-mats { font-size: 11px; color: var(--text3); margin-top: 4px; }
@@ -537,11 +539,12 @@ body {
 /* ---- Themes ---- */
 .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .theme-swatch {
-  padding: 12px; border-radius: 10px; border: 2px solid transparent;
-  cursor: pointer; text-align: center; font-size: 13px; font-weight: 600;
-  transition: all 0.3s;
+  padding: 10px; border-radius: 8px; border: 2px solid var(--border);
+  cursor: pointer; text-align: center; font-size: 12px; font-weight: 600;
+  transition: all 0.3s ease; position: relative;
 }
-.theme-swatch.active { border-color: var(--accent2); }
+.theme-swatch:hover { transform: translateY(-2px); box-shadow: 0 4px 16px var(--glow2); }
+.theme-swatch.active { border-color: var(--accent2); box-shadow: 0 0 16px var(--glow); transform: translateY(-2px); }
 .theme-swatch.purple { background: #0a0a1a; color: #e040fb; border-color: rgba(224,64,251,0.3); }
 .theme-swatch.nether { background: #1a0a0a; color: #ff4444; border-color: rgba(255,68,68,0.3); }
 .theme-swatch.ender { background: #0a0a1a; color: #00e676; border-color: rgba(0,230,118,0.3); }
@@ -583,6 +586,35 @@ body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 2px; }
+
+/* ---- Changelog ---- */
+.s2-changelog { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 12px; color: var(--text); opacity: 0.75; margin-top: 6px; }
+
+/* ---- Tab Bar ---- */
+.tab-bar { display: flex; gap: 4px; margin-bottom: 10px; }
+.tab-btn { padding: 6px 14px; background: var(--bg2); border: 1px solid var(--border); color: var(--text3); border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s; font-family: inherit; }
+.tab-btn:hover { border-color: var(--border2); color: var(--text2); }
+.tab-btn.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border-color: transparent; }
+
+/* ---- Seed Card ---- */
+.seed-card { background: var(--bg2); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-top: 10px; font-size: 13px; line-height: 1.7; }
+.seed-card .seed-num { font-size: 18px; font-weight: 700; background: linear-gradient(135deg, var(--accent2), var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.seed-card .seed-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; background: var(--hover); color: var(--text2); margin: 2px 4px 2px 0; }
+
+/* ---- Brewing / Enchantment results ---- */
+.brew-result, .ench-result { margin-top: 8px; }
+.brew-item, .ench-item { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; font-size: 12px; line-height: 1.5; }
+.brew-item strong, .ench-item strong { color: var(--accent2); }
+
+/* ---- Kudos & Events ---- */
+.kudo-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; font-size: 12px; line-height: 1.5; }
+.kudo-card .kudo-from { color: var(--accent2); font-weight: 600; }
+.kudo-card .kudo-msg { color: var(--text); opacity: 0.8; margin-top: 2px; }
+.event-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+.event-card .ev-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.event-card .ev-time { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.event-card .ev-desc { font-size: 12px; color: var(--text); opacity: 0.7; margin-top: 4px; line-height: 1.5; }
+.event-card .ev-countdown { font-size: 13px; font-weight: 600; color: var(--accent2); margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -597,7 +629,7 @@ body {
     <input id="name-input" type="text" placeholder="Enter your IGN..." maxlength="16" autofocus>
     <button class="btn" onclick="join()">Join Chat</button>
     <div class="join-error" id="join-error"></div>
-    <div class="join-tip" id="join-tip"></div>
+    <div class="join-tip" id="join-tip"><span class="tip-arrow" onclick="switchTip(-1)">◀</span><span class="tip-text" id="tip-text"></span><span class="tip-arrow" onclick="switchTip(1)">▶</span></div>
   </div>
   <div class="join-footer">
     <a href="#" onclick="event.preventDefault();openWheel()">🎰 Randomizer</a>
@@ -674,6 +706,8 @@ body {
           <button class="menu-item" onclick="showSection('conversations')"><span class="icon">💬</span><span class="label">Public Conversations</span><span class="arrow">→</span></button>
           <button class="menu-item" onclick="showSection('builds')"><span class="icon">🏗️</span><span class="label">Build Ideas</span><span class="arrow">→</span></button>
           <button class="menu-item" onclick="showSection('polls')"><span class="icon">📊</span><span class="label">Polls</span><span class="arrow">→</span></button>
+          <button class="menu-item" onclick="showSection('kudos')"><span class="icon">🌟</span><span class="label">Player Kudos</span><span class="arrow">→</span></button>
+          <button class="menu-item" onclick="showSection('events')"><span class="icon">📅</span><span class="label">Community Events</span><span class="arrow">→</span></button>
         </div>
       </div>
       <!-- Tools -->
@@ -686,6 +720,9 @@ body {
           <a class="menu-item" href="/origins.html" target="_blank"><span class="icon">🔮</span><span class="label">Origins Browser</span><span class="arrow">↗</span></a>
           <a class="menu-item" href="/leaderboard.html" target="_blank"><span class="icon">🏆</span><span class="label">Leaderboard</span><span class="arrow">↗</span></a>
           <button class="menu-item" onclick="closeMenu();openWheel()"><span class="icon">🎰</span><span class="label">Randomizer</span><span class="arrow">→</span></button>
+          <button class="menu-item" onclick="showSection('brewing')"><span class="icon">🧪</span><span class="label">Brewing Guide</span><span class="arrow">→</span></button>
+          <button class="menu-item" onclick="showSection('enchanting')"><span class="icon">📖</span><span class="label">Enchantment Helper</span><span class="arrow">→</span></button>
+          <button class="menu-item" onclick="showSection('seeds')"><span class="icon">🌱</span><span class="label">Seed Generator</span><span class="arrow">→</span></button>
         </div>
       </div>
       <!-- Appearance -->
@@ -809,6 +846,8 @@ body {
       <div class="si-item"><span class="si-key">Origins</span><span class="si-val">6 packs</span></div>
       <div class="si-item"><span class="si-key">PowerTrims</span><span class="si-val">v2.9</span></div>
       <div class="si-item"><span class="si-key">Memory</span><span class="si-val">1MB</span></div>
+      <div style="margin-top:10px;"><button class="btn-s" onclick="pingServer()">🔄 Ping Server</button>
+      <span id="ping-result" style="font-size:12px;color:var(--text3);margin-left:8px;"></span></div>
       <div class="si-desc">Ask MTM about origins, trims, builds, recipes, and more. Use /build, /roll, /recipe, /tip, /lore.</div>
     </div>
 
@@ -817,7 +856,92 @@ body {
       <div class="section-title">About MTM</div>
       <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">v2.0 — Season 2</div>
       <div style="font-size:13px;line-height:1.6;color:var(--text);opacity:0.7;">Built by revalize. AI assistant for the server community. Powered by Cerebras, Netlify, GitHub.</div>
+      <div class="section-title" style="margin-top:16px;">What's New in S2</div>
+      <div class="s2-changelog">
+        <div>🎨 5 themes</div>
+        <div>🔮 Origins Browser</div>
+        <div>🏆 XP & Leaderboard</div>
+        <div>💬 Public Conversations</div>
+        <div>🎰 Randomizer Wheel</div>
+        <div>📊 Community Polls</div>
+        <div>🏗️ Build Gallery</div>
+        <div>🌟 Player Kudos</div>
+        <div>📅 Community Events</div>
+        <div>🧪 Brewing Guide</div>
+        <div>📖 Enchantment Helper</div>
+        <div>🌱 Seed Generator</div>
+        <div>⌨️ Command Palette</div>
+        <div>🎤 Voice Input</div>
+        <div>🎨 Collapsible Menu</div>
+        <div>📅 Daily Check-in</div>
+        <div>🔔 Sound Pack</div>
+      </div>
       <div style="margin-top:14px;font-size:11px;color:var(--text3);">2024-2026</div>
+    </div>
+
+    <!-- Brewing Guide -->
+    <div class="menu-section" id="section-brewing">
+      <div class="section-title">🧪 Brewing Guide</div>
+      <div class="section-desc">Look up potion recipes by ingredient or by potion name.</div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="setBrewTab('ingredient',this)">By Ingredient</button>
+        <button class="tab-btn" onclick="setBrewTab('potion',this)">By Potion</button>
+      </div>
+      <div id="brew-ingredient-panel">
+        <select id="brew-ingredient" onchange="lookupBrewByIngredient()">
+          <option value="">Select an ingredient...</option>
+        </select>
+        <div id="brew-ingredient-result"></div>
+      </div>
+      <div id="brew-potion-panel" style="display:none;">
+        <select id="brew-potion" onchange="lookupBrewByPotion()">
+          <option value="">Select a potion...</option>
+        </select>
+        <div id="brew-potion-result"></div>
+      </div>
+    </div>
+
+    <!-- Enchanting Helper -->
+    <div class="menu-section" id="section-enchanting">
+      <div class="section-title">📖 Enchantment Helper</div>
+      <div class="section-desc">See what enchantments work on each item.</div>
+      <select id="ench-item" onchange="showEnchants()">
+        <option value="">Pick an item...</option>
+      </select>
+      <div id="ench-result"></div>
+    </div>
+
+    <!-- Seed Generator -->
+    <div class="menu-section" id="section-seeds">
+      <div class="section-title">🌱 Seed Generator</div>
+      <div class="section-desc">Get interesting Minecraft seeds with biomes and structures.</div>
+      <button class="btn-s" onclick="generateSeed()">🎲 Generate Seed</button>
+      <div id="seed-result" class="seed-card" style="display:none;"></div>
+    </div>
+
+    <!-- Kudos -->
+    <div class="menu-section" id="section-kudos">
+      <div class="section-title">🌟 Player Kudos</div>
+      <div class="section-desc">Give a shoutout to a helpful player!</div>
+      <input id="kudos-target" type="text" placeholder="Player name..." maxlength="16">
+      <input id="kudos-message" type="text" placeholder="Why they're awesome..." maxlength="200">
+      <button class="btn-s" onclick="giveKudos()">🌟 Give Kudos</button>
+      <div id="kudos-status" class="status-msg"></div>
+      <div class="section-title" style="margin-top:12px;">🏆 Top Kudos</div>
+      <div id="kudos-list"></div>
+    </div>
+
+    <!-- Events -->
+    <div class="menu-section" id="section-events">
+      <div class="section-title">📅 Community Events</div>
+      <div class="section-desc">Upcoming server events and activities.</div>
+      <div id="events-list"></div>
+      <div class="section-title" style="margin-top:12px;">➕ Create Event</div>
+      <input id="event-title" type="text" placeholder="Event name..." maxlength="200">
+      <input id="event-date" type="datetime-local">
+      <textarea id="event-desc" placeholder="Description..." maxlength="1000"></textarea>
+      <button class="btn-s" onclick="createEvent()">📅 Create Event</button>
+      <div id="event-status" class="status-msg"></div>
     </div>
   </div>
 </div>
@@ -878,7 +1002,7 @@ const tips = [
 ];
 let tipIdx = 0;
 function showTip() {
-  const el = document.getElementById('join-tip');
+  const el = document.getElementById('tip-text');
   el.style.opacity = 0;
   setTimeout(() => {
     el.textContent = tips[tipIdx % tips.length];
@@ -1159,11 +1283,15 @@ function showSection(name) {
   const sec = document.getElementById('section-' + name);
   if (sec) sec.classList.add('active');
   document.getElementById('menu-back-btn').style.display = '';
-  const titles = { conversations:'Public Conversations', builds:'Build Ideas', polls:'Polls', themes:'Themes', server:'Server Info', about:'About' };
+  const titles = { conversations:'Public Conversations', builds:'Build Ideas', polls:'Polls', themes:'Themes', server:'Server Info', about:'About', brewing:'Brewing Guide', enchanting:'Enchantment Helper', seeds:'Seed Generator', kudos:'Player Kudos', events:'Community Events' };
   document.getElementById('menu-title').textContent = titles[name] || 'Menu';
   if (name === 'conversations') loadConversations();
   if (name === 'builds') loadBuilds();
   if (name === 'polls') loadPolls();
+  if (name === 'brewing') initBrewing();
+  if (name === 'enchanting') initEnchanting();
+  if (name === 'kudos') loadKudos();
+  if (name === 'events') loadEvents();
 }
 
 function goBackToMenu() {
@@ -1722,6 +1850,339 @@ function stopListening() {
   document.getElementById('mic-icon').textContent = '🎤';
   document.getElementById('msg-input').placeholder = 'Ask MTM anything...';
   try { if (speechRec) speechRec.stop(); } catch(e) {}
+}
+
+// ===== Server Ping =====
+async function pingServer() {
+  const status = document.getElementById('ping-result');
+  status.textContent = 'Pinging...';
+  status.style.color = 'var(--text3)';
+  try {
+    const res = await fetch('https://api.mcstatus.io/v2/status/java/mtm.minehut.gg', { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data.online) {
+      status.textContent = '✅ Online (' + data.players.online + '/' + data.players.max + ' players)';
+      status.style.color = '#4caf50';
+    } else {
+      status.textContent = '❌ Offline';
+      status.style.color = '#ff5252';
+    }
+  } catch (e) {
+    status.textContent = '⚠ Could not reach server';
+    status.style.color = '#ff5252';
+  }
+}
+
+// ===== Brewing Guide =====
+const BREW_DATA = {
+  'Nether Wart': ['Awkward Potion'],
+  'Glowstone Dust': ['Thick Potion'],
+  'Redstone': ['Mundane Potion (extended)'],
+  'Gunpowder': ['Splash Potion'],
+  'Dragon's Breath': ['Lingering Potion'],
+  'Sugar': ['Potion of Swiftness'],
+  'Rabbit's Foot': ['Potion of Leaping'],
+  'Blaze Powder': ['Potion of Strength'],
+  'Glistering Melon': ['Potion of Healing'],
+  'Spider Eye': ['Potion of Poison'],
+  'Ghast Tear': ['Potion of Regeneration'],
+  'Magma Cream': ['Potion of Fire Resistance'],
+  'Pufferfish': ['Potion of Water Breathing'],
+  'Golden Carrot': ['Potion of Night Vision'],
+  'Turtle Shell': ['Potion of the Turtle Master'],
+  'Phantom Membrane': ['Potion of Slow Falling'],
+  'Fermented Spider Eye': ['Potion of Weakness'],
+};
+const POTION_INGREDIENTS = {
+  'Potion of Swiftness': 'Sugar',
+  'Potion of Leaping': 'Rabbit's Foot',
+  'Potion of Strength': 'Blaze Powder',
+  'Potion of Healing': 'Glistering Melon',
+  'Potion of Poison': 'Spider Eye',
+  'Potion of Regeneration': 'Ghast Tear',
+  'Potion of Fire Resistance': 'Magma Cream',
+  'Potion of Water Breathing': 'Pufferfish',
+  'Potion of Night Vision': 'Golden Carrot',
+  'Potion of the Turtle Master': 'Turtle Shell',
+  'Potion of Slow Falling': 'Phantom Membrane',
+  'Potion of Weakness': 'Fermented Spider Eye',
+};
+
+let brewInited = false;
+function initBrewing() {
+  if (brewInited) return;
+  brewInited = true;
+  const ingSel = document.getElementById('brew-ingredient');
+  const potSel = document.getElementById('brew-potion');
+  const ings = Object.keys(BREW_DATA).sort();
+  const pots = Object.keys(POTION_INGREDIENTS).sort();
+  for (const i of ings) { const o = document.createElement('option'); o.value = i; o.textContent = i; ingSel.appendChild(o); }
+  for (const p of pots) { const o = document.createElement('option'); o.value = p; o.textContent = p; potSel.appendChild(o); }
+}
+
+function setBrewTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('brew-ingredient-panel').style.display = tab === 'ingredient' ? '' : 'none';
+  document.getElementById('brew-potion-panel').style.display = tab === 'potion' ? '' : 'none';
+}
+
+function lookupBrewByIngredient() {
+  const sel = document.getElementById('brew-ingredient');
+  const res = document.getElementById('brew-ingredient-result');
+  const val = sel.value;
+  if (!val) { res.innerHTML = ''; return; }
+  const results = BREW_DATA[val] || ['Nothing (not a valid brewing ingredient)'];
+  res.innerHTML = '<div class="brew-result">' + results.map(r => '<div class="brew-item"><strong>→</strong> ' + esc(r) + '</div>').join('') + '</div>';
+}
+
+function lookupBrewByPotion() {
+  const sel = document.getElementById('brew-potion');
+  const res = document.getElementById('brew-potion-result');
+  const val = sel.value;
+  if (!val) { res.innerHTML = ''; return; }
+  const ing = POTION_INGREDIENTS[val] || 'Unknown';
+  res.innerHTML = '<div class="brew-result"><div class="brew-item"><strong>Ingredient:</strong> ' + esc(ing) + ' + Awkward Potion</div></div>';
+}
+
+// ===== Enchantment Helper =====
+const ENCH_DATA = {
+  'Sword': [
+    { name: 'Sharpness', max: 5, conflict: ['Smite', 'Bane of Arthropods'] },
+    { name: 'Smite', max: 5, conflict: ['Sharpness', 'Bane of Arthropods'] },
+    { name: 'Bane of Arthropods', max: 5, conflict: ['Sharpness', 'Smite'] },
+    { name: 'Fire Aspect', max: 2 },
+    { name: 'Looting', max: 3 },
+    { name: 'Knockback', max: 2 },
+    { name: 'Unbreaking', max: 3 },
+    { name: 'Mending', max: 1, conflict: ['Curse of Vanishing'] },
+    { name: 'Curse of Vanishing', max: 1, conflict: ['Mending'] },
+    { name: 'Sweeping Edge', max: 3 },
+  ],
+  'Pickaxe': [
+    { name: 'Efficiency', max: 5 },
+    { name: 'Fortune', max: 3, conflict: ['Silk Touch'] },
+    { name: 'Silk Touch', max: 1, conflict: ['Fortune'] },
+    { name: 'Unbreaking', max: 3 },
+    { name: 'Mending', max: 1, conflict: ['Curse of Vanishing'] },
+    { name: 'Curse of Vanishing', max: 1, conflict: ['Mending'] },
+  ],
+  'Axe': [
+    { name: 'Efficiency', max: 5 },
+    { name: 'Fortune', max: 3, conflict: ['Silk Touch'] },
+    { name: 'Silk Touch', max: 1, conflict: ['Fortune'] },
+    { name: 'Sharpness', max: 5, conflict: ['Smite', 'Bane of Arthropods'] },
+    { name: 'Smite', max: 5, conflict: ['Sharpness', 'Bane of Arthropods'] },
+    { name: 'Bane of Arthropods', max: 5, conflict: ['Sharpness', 'Smite'] },
+    { name: 'Unbreaking', max: 3 },
+    { name: 'Mending', max: 1, conflict: ['Curse of Vanishing'] },
+    { name: 'Curse of Vanishing', max: 1, conflict: ['Mending'] },
+  ],
+  'Bow': [
+    { name: 'Power', max: 5 },
+    { name: 'Punch', max: 2 },
+    { name: 'Flame', max: 1 },
+    { name: 'Infinity', max: 1, conflict: ['Mending'] },
+    { name: 'Unbreaking', max: 3 },
+    { name: 'Mending', max: 1, conflict: ['Infinity'] },
+    { name: 'Curse of Vanishing', max: 1, conflict: ['Mending'] },
+  ],
+  'Helmet': [
+    { name: 'Protection', max: 4, conflict: ['Fire Protection', 'Blast Protection', 'Projectile Protection'] },
+    { name: 'Fire Protection', max: 4, conflict: ['Protection', 'Blast Protection', 'Projectile Protection'] },
+    { name: 'Blast Protection', max: 4, conflict: ['Protection', 'Fire Protection', 'Projectile Protection'] },
+    { name: 'Projectile Protection', max: 4, conflict: ['Protection', 'Fire Protection', 'Blast Protection'] },
+    { name: 'Respiration', max: 3 },
+    { name: 'Aqua Affinity', max: 1 },
+    { name: 'Unbreaking', max: 3 },
+    { name: 'Mending', max: 1, conflict: ['Curse of Vanishing'] },
+    { name: 'Curse of Vanishing', max: 1, conflict: ['Mending'] },
+    { name: 'Thorns', max: 3 },
+  ],
+  'Chestplate': [
+    { name: 'Protection', max: 4, conflict: ['Fire Protection', 'Blast Protection', 'Projectile Protection'] },
+    { name: 'Fire Protection', max: 4, conflict: ['Protection', 'Blast Protection', 'Projectile Protection'] },
+    { name: 'Blast Protection', max: 4, conflict: ['Protection', 'Fire Protection', 'Projectile Protection'] },
+    { name: 'Projectile Protection', max: 4, conflict: ['Protection', 'Fire Protection', 'Blast Protection'] },
+    { name: 'Unbreaking', max: 3 },
+    { name: 'Mending', max: 1, conflict: ['Curse of Vanishing'] },
+    { name: 'Curse of Vanishing', max: 1, conflict: ['Mending'] },
+    { name: 'Thorns', max: 3 },
+  ],
+  'Leggings': [
+    { name: 'Protection', max: 4, conflict: ['Fire Protection', 'Blast Protection', 'Projectile Protection'] },
+    { name: 'Fire Protection', max: 4, conflict: ['Protection', 'Blast Protection', 'Projectile Protection'] },
+    { name: 'Blast Protection', max: 4, conflict: ['Protection', 'Fire Protection', 'Projectile Protection'] },
+    { name: 'Projectile Protection', max: 4, conflict: ['Protection', 'Fire Protection', 'Blast Protection'] },
+    { name: 'Swift Sneak', max: 3 },
+    { name: 'Unbreaking', max: 3 },
+    { name: 'Mending', max: 1, conflict: ['Curse of Vanishing'] },
+    { name: 'Curse of Vanishing', max: 1, conflict: ['Mending'] },
+    { name: 'Thorns', max: 3 },
+  ],
+  'Boots': [
+    { name: 'Protection', max: 4, conflict: ['Fire Protection', 'Blast Protection', 'Projectile Protection'] },
+    { name: 'Fire Protection', max: 4, conflict: ['Protection', 'Blast Protection', 'Projectile Protection'] },
+    { name: 'Blast Protection', max: 4, conflict: ['Protection', 'Fire Protection', 'Projectile Protection'] },
+    { name: 'Projectile Protection', max: 4, conflict: ['Protection', 'Fire Protection', 'Blast Protection'] },
+    { name: 'Feather Falling', max: 4 },
+    { name: 'Depth Strider', max: 3, conflict: ['Frost Walker'] },
+    { name: 'Frost Walker', max: 2, conflict: ['Depth Strider'] },
+    { name: 'Soul Speed', max: 3 },
+    { name: 'Unbreaking', max: 3 },
+    { name: 'Mending', max: 1, conflict: ['Curse of Vanishing'] },
+    { name: 'Curse of Vanishing', max: 1, conflict: ['Mending'] },
+    { name: 'Thorns', max: 3 },
+  ],
+  'Trident': [
+    { name: 'Impaling', max: 5 },
+    { name: 'Loyalty', max: 3, conflict: ['Channeling', 'Riptide'] },
+    { name: 'Channeling', max: 1, conflict: ['Loyalty', 'Riptide'] },
+    { name: 'Riptide', max: 3, conflict: ['Loyalty', 'Channeling'] },
+    { name: 'Unbreaking', max: 3 },
+    { name: 'Mending', max: 1, conflict: ['Curse of Vanishing'] },
+    { name: 'Curse of Vanishing', max: 1, conflict: ['Mending'] },
+  ],
+};
+
+let enchInited = false;
+function initEnchanting() {
+  if (enchInited) return;
+  enchInited = true;
+  const sel = document.getElementById('ench-item');
+  const items = Object.keys(ENCH_DATA).sort();
+  for (const item of items) { const o = document.createElement('option'); o.value = item; o.textContent = item; sel.appendChild(o); }
+}
+
+function showEnchants() {
+  const sel = document.getElementById('ench-item');
+  const res = document.getElementById('ench-result');
+  const item = sel.value;
+  if (!item || !ENCH_DATA[item]) { res.innerHTML = ''; return; }
+  const enchants = ENCH_DATA[item];
+  res.innerHTML = '<div class="ench-result">' + enchants.map(e => {
+    const conflicts = e.conflict ? ' <span style="color:var(--text3);font-size:11px;">✗ conflicts with ' + e.conflict.join(', ') + '</span>' : '';
+    return '<div class="ench-item"><strong>' + esc(e.name) + ' ' + e.max + '</strong>' + conflicts + '</div>';
+  }).join('') + '</div>';
+}
+
+// ===== Seed Generator =====
+const STRUCTURES = ['Village', 'Temple', 'Pillager Outpost', 'Shipwreck', 'Ocean Monument', 'Woodland Mansion', 'Stronghold', 'Ancient City', 'Bastion Remnant', 'End City', 'Nether Fortress'];
+const BIOMES = ['Plains', 'Desert', 'Taiga', 'Swamp', 'Jungle', 'Badlands', 'Snowy Tundra', 'Mushroom Fields', 'Cherry Grove', 'Dark Forest', 'Savanna', 'Windswept Hills', 'Meadow', 'Stony Shore', 'Deep Dark', 'Crimson Forest', 'Warped Forest', 'Soul Sand Valley', 'Basalt Deltas', 'End Highlands'];
+function generateSeed() {
+  const seed = Math.floor(Math.random() * 2147483647);
+  const numStructures = Math.floor(Math.random() * 4) + 2;
+  const structs = [];
+  const used = new Set();
+  for (let i = 0; i < numStructures; i++) {
+    let s;
+    do { s = STRUCTURES[Math.floor(Math.random() * STRUCTURES.length)]; } while (used.has(s));
+    used.add(s);
+    structs.push(s);
+  }
+  const biome = BIOMES[Math.floor(Math.random() * BIOMES.length)];
+  const coords = '~' + (Math.floor(Math.random() * 2000) - 1000) + ' ~' + (Math.floor(Math.random() * 2000) - 1000);
+  const div = document.getElementById('seed-result');
+  div.style.display = '';
+  div.innerHTML = '<div class="seed-num">' + seed + '</div>' +
+    '<div style="margin-top:6px;"><span class="seed-tag">' + esc(biome) + '</span>' + structs.map(s => '<span class="seed-tag">' + esc(s) + '</span>').join('') + '</div>' +
+    '<div style="margin-top:6px;color:var(--text3);font-size:12px;">Spawn near ' + coords + ' | ' + numStructures + ' nearby structures</div>';
+  playTone(660, 0.08, 'sine', 0.05);
+}
+
+// ===== Player Kudos =====
+async function loadKudos() {
+  const list = document.getElementById('kudos-list');
+  list.innerHTML = '<div class="status-msg">Loading...</div>';
+  try {
+    const res = await fetch(API_URL + '?action=kudos');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    list.innerHTML = '';
+    if (!data || data.length === 0) { list.innerHTML = '<div class="status-msg">No kudos yet. Be the first!</div>'; return; }
+    for (const k of data) {
+      const card = document.createElement('div');
+      card.className = 'kudo-card';
+      card.innerHTML = '<strong style="color:var(--accent2);font-size:14px;">' + esc(k.player) + '</strong> — ' + k.count + ' kudos' +
+        (k.recent && k.recent.length > 0 ? '<div style="margin-top:4px;font-size:11px;color:var(--text3);">Recent: ' + k.recent.slice(0, 3).map(r => r.from + ': "' + esc(r.message) + '"').join(', ') + '</div>' : '');
+      list.appendChild(card);
+    }
+  } catch (e) { list.innerHTML = '<div class="status-msg">Failed to load: ' + e.message + '</div>'; }
+}
+
+async function giveKudos() {
+  const target = document.getElementById('kudos-target').value.trim();
+  const message = document.getElementById('kudos-message').value.trim();
+  const status = document.getElementById('kudos-status');
+  if (!target) { status.textContent = 'Enter a player name.'; return; }
+  if (target === playerName) { status.textContent = 'You can't kudo yourself!'; return; }
+  status.textContent = 'Sending...';
+  try {
+    const res = await fetch(API_URL + '?action=kudos', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targetPlayer: target, fromPlayer: playerName, message }),
+    });
+    if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'HTTP ' + res.status); }
+    document.getElementById('kudos-target').value = '';
+    document.getElementById('kudos-message').value = '';
+    status.textContent = '🌟 Kudos given to ' + target + '!';
+    status.style.color = 'var(--accent2)';
+    loadKudos();
+    playTone(660, 0.08, 'sine', 0.05);
+  } catch (e) { status.textContent = 'Error: ' + e.message; status.style.color = '#ff5252'; }
+}
+
+// ===== Community Events =====
+async function loadEvents() {
+  const list = document.getElementById('events-list');
+  list.innerHTML = '<div class="status-msg">Loading...</div>';
+  try {
+    const res = await fetch(API_URL + '?action=events');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    list.innerHTML = '';
+    if (!data || data.length === 0) { list.innerHTML = '<div class="status-msg">No upcoming events. Create one!</div>'; return; }
+    for (const ev of data) {
+      const dt = new Date(ev.dateTime);
+      const now = new Date();
+      const diff = dt - now;
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      const countdown = diff > 0 ? (days > 0 ? days + 'd ' : '') + hours + 'h ' + mins + 'm' : 'Started!';
+      const card = document.createElement('div');
+      card.className = 'event-card';
+      card.innerHTML = '<div class="ev-title">' + esc(ev.title) + '</div>' +
+        '<div class="ev-time">' + dt.toLocaleString() + ' · by ' + esc(ev.createdBy) + '</div>' +
+        (ev.description ? '<div class="ev-desc">' + esc(ev.description) + '</div>' : '') +
+        '<div class="ev-countdown">⏱ ' + countdown + '</div>';
+      list.appendChild(card);
+    }
+  } catch (e) { list.innerHTML = '<div class="status-msg">Failed to load events: ' + e.message + '</div>'; }
+}
+
+async function createEvent() {
+  const title = document.getElementById('event-title').value.trim();
+  const dateTime = document.getElementById('event-date').value;
+  const desc = document.getElementById('event-desc').value.trim();
+  const status = document.getElementById('event-status');
+  if (!title || !dateTime) { status.textContent = 'Enter a title and date/time.'; return; }
+  status.textContent = 'Creating...';
+  try {
+    const res = await fetch(API_URL + '?action=event-create', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, dateTime, description: desc, playerName }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    document.getElementById('event-title').value = '';
+    document.getElementById('event-date').value = '';
+    document.getElementById('event-desc').value = '';
+    status.textContent = '✅ Event created!';
+    status.style.color = '#4caf50';
+    loadEvents();
+    playTone(660, 0.08, 'sine', 0.05);
+  } catch (e) { status.textContent = 'Error: ' + e.message; status.style.color = '#ff5252'; }
 }
 
 // ===== Utility =====
