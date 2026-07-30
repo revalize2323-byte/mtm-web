@@ -278,24 +278,33 @@ exports.handler = async function (event) {
       // Strip non-Cerebras fields before forwarding
       const { playerName: _, ...cerebrasBody } = body;
 
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000);
+      // Retry up to 3 times with exponential backoff on 429
       let res;
-      try {
-        res = await fetch(CEREBRAS_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${CEREBRAS_KEY}`,
-          },
-          body: JSON.stringify(cerebrasBody),
-          signal: controller.signal,
-        });
-      } catch (fetchErr) {
-        clearTimeout(timeout);
-        throw new Error('Cerebras API error: ' + fetchErr.message);
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+        try {
+          res = await fetch(CEREBRAS_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${CEREBRAS_KEY}`,
+            },
+            body: JSON.stringify(cerebrasBody),
+            signal: controller.signal,
+          });
+          clearTimeout(timeout);
+          if (res.status !== 429) break;
+          // Rate limited — wait and retry
+          const wait = Math.pow(2, attempt) * 1000;
+          console.log(`[MTM] Rate limited, retry ${attempt + 1} in ${wait}ms`);
+          await new Promise(r => setTimeout(r, wait));
+        } catch (fetchErr) {
+          clearTimeout(timeout);
+          if (attempt === 2) throw new Error('Cerebras API error: ' + fetchErr.message);
+          await new Promise(r => setTimeout(r, 1000));
+        }
       }
-      clearTimeout(timeout);
 
       let data, reply;
       try {
