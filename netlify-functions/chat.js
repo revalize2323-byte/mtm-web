@@ -2,7 +2,7 @@ const { getStore } = require('@netlify/blobs');
 
 const CEREBRAS_KEY = 'csk-v8rnfxfyyx9jky56crrfm26dmn4kfnj545f4y9d99j3ccyj3';
 const CEREBRAS_URL = 'https://api.cerebras.ai/v1/chat/completions';
-const ADMIN_PW = 'mtm2024';
+const ADMIN_PW = 'mtm3000';
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
