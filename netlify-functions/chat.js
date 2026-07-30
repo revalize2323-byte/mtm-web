@@ -275,6 +275,9 @@ exports.handler = async function (event) {
       // ===== Default: Chat proxy =====
       console.log(`[MTM] Chat from ${body.playerName || '?'}: "${(body.messages?.filter(m => m.role === 'user').pop()?.content || '').slice(0, 80)}"`);
 
+      // Strip non-Cerebras fields before forwarding
+      const { playerName: _, ...cerebrasBody } = body;
+
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 15000);
       let res;
@@ -285,7 +288,7 @@ exports.handler = async function (event) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${CEREBRAS_KEY}`,
           },
-          body: JSON.stringify(body),
+          body: JSON.stringify(cerebrasBody),
           signal: controller.signal,
         });
       } catch (fetchErr) {
